@@ -122,6 +122,7 @@ $currentYear = date('Y');
             <div class="d-flex justify-content-center gap-3">
                 <a href="#features" class="btn btn-light btn-lg px-4">Explore Features</a>
                 <a href="#demo" class="btn btn-outline-light btn-lg px-4">View Demo</a>
+                <a href="ai_demo.php" class="btn btn-warning btn-lg px-4"><i class="fa fa-robot"></i> AI Features</a>
             </div>
         </div>
     </section>
@@ -211,7 +212,7 @@ $currentYear = date('Y');
             </div>
             
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
                             <h3 class="card-title">Teacher Dashboard</h3>
@@ -221,7 +222,7 @@ $currentYear = date('Y');
                     </div>
                 </div>
                 
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
                             <h3 class="card-title">Student Dashboard</h3>
@@ -231,12 +232,22 @@ $currentYear = date('Y');
                     </div>
                 </div>
                 
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
                             <h3 class="card-title">Admin Dashboard</h3>
                             <p class="card-text">Manage users, courses, and system settings, plus get AI-powered insights.</p>
                             <a href="admin/dashboard.php" class="btn btn-danger">View Demo</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center bg-light">
+                            <h3 class="card-title"><i class="fa fa-robot text-warning"></i> AI Features</h3>
+                            <p class="card-text">Try out our AI-powered features like course generation, automated feedback, and more.</p>
+                            <a href="ai_demo.php" class="btn btn-warning">Try AI Features</a>
                         </div>
                     </div>
                 </div>
