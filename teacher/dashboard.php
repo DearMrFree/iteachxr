@@ -67,6 +67,18 @@ $pageTitle = "Teacher Dashboard - iTeachXR";
                         </a>
                     </li>
                     <li>
+                        <a href="/teacher/collaborative_workspace.php" class="nav-link text-white">
+                            <i class="fa fa-users me-2"></i>
+                            Collaboration
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ai_demo.php" class="nav-link text-white">
+                            <i class="fa fa-magic me-2"></i>
+                            AI Tools
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" class="nav-link text-white">
                             <i class="fa fa-users me-2"></i>
                             Students
@@ -230,8 +242,12 @@ $pageTitle = "Teacher Dashboard - iTeachXR";
                             <hr>
                             <h6>Quick Actions</h6>
                             <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm">Generate Quiz</button>
-                                <button class="btn btn-outline-primary btn-sm">Create Lesson Plan</button>
+                                <a href="/ai_demo.php" class="btn btn-outline-primary btn-sm">
+                                    <i class="fa fa-magic me-1"></i> AI Tools
+                                </a>
+                                <a href="/teacher/collaborative_workspace.php" class="btn btn-outline-primary btn-sm">
+                                    <i class="fa fa-users me-1"></i> Collaborative Workspace
+                                </a>
                                 <button class="btn btn-outline-primary btn-sm">Analyze Performance</button>
                             </div>
                         </div>

@@ -1,642 +1,488 @@
 <?php
-// Include necessary files
-require_once('../config.php');
-require_once('../lib/db_connection.php');
-require_once('../lib/moodlelib.php');
+// Teacher Document Editor page
+$pageTitle = "Document Editor - iTeachXR";
+$user = [
+    'id' => 1,
+    'full_name' => 'Dr. Sarah Chen',
+    'email' => 'sarah.chen@example.edu',
+    'role' => 'teacher'
+];
 
-// Check if user is logged in
-$user = check_user_auth();
-if (!$user || $user['role'] !== 'teacher') {
-    header('Location: ../index.php');
-    exit;
-}
+// Get document ID from URL parameter (with validation)
+$document_id = isset($_GET['id']) ? intval($_GET['id']) : 1;
 
-// Check if document ID is provided
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header('Location: collaborative_workspace.php');
-    exit;
-}
+// Sample document data (in a real app, this would come from a database)
+$document = [
+    'id' => $document_id,
+    'name' => 'VR Headset Comparison Guide',
+    'content' => '<h1>VR Headset Comparison Guide</h1>
+<p>This guide provides a comprehensive comparison of VR headsets for educational use, focusing on features relevant to classroom implementation.</p>
 
-$document_id = (int)$_GET['id'];
-$user_id = $user['id'];
-$document = null;
-$workspace = null;
-$versions = [];
-$comments = [];
-$user_role = null;
-$can_edit = false;
+<h2>Standalone VR Headsets</h2>
+<h3>Meta Quest 3</h3>
+<ul>
+    <li><strong>Price Range:</strong> $499 - $650</li>
+    <li><strong>Resolution:</strong> 2064 x 2208 per eye</li>
+    <li><strong>Field of View:</strong> ~110 degrees</li>
+    <li><strong>Weight:</strong> 515g</li>
+    <li><strong>Battery Life:</strong> 2-3 hours</li>
+    <li><strong>Educational Features:</strong>
+        <ul>
+            <li>Standalone operation (no PC required)</li>
+            <li>Hand tracking for intuitive interaction</li>
+            <li>Group management tools for classrooms</li>
+            <li>Educational content library</li>
+        </ul>
+    </li>
+    <li><strong>Pros:</strong> Portable, easy setup, growing educational content library</li>
+    <li><strong>Cons:</strong> Battery life limitations, requires Meta account</li>
+</ul>
 
-try {
-    $db = get_db_connection();
-    
-    // Get document details
-    $docStmt = $db->prepare("
-        SELECT wd.*, u.full_name as creator_name, cw.id as workspace_id, cw.title as workspace_title
-        FROM workspace_documents wd
-        JOIN users u ON wd.created_by = u.id
-        JOIN collaborative_workspaces cw ON wd.workspace_id = cw.id
-        WHERE wd.id = :document_id
-    ");
-    
-    $docStmt->execute(['document_id' => $document_id]);
-    $document = $docStmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$document) {
-        header('Location: collaborative_workspace.php');
-        exit;
-    }
-    
-    $workspace_id = $document['workspace_id'];
-    
-    // Check if user is a member of this workspace
-    $memberStmt = $db->prepare("
-        SELECT role FROM workspace_members
-        WHERE workspace_id = :workspace_id AND user_id = :user_id
-    ");
-    
-    $memberStmt->execute([
-        'workspace_id' => $workspace_id,
-        'user_id' => $user_id
-    ]);
-    
-    $user_role = $memberStmt->fetchColumn();
-    
-    if (!$user_role) {
-        // Check if workspace is public
-        $publicStmt = $db->prepare("
-            SELECT is_public FROM collaborative_workspaces
-            WHERE id = :workspace_id
-        ");
-        
-        $publicStmt->execute(['workspace_id' => $workspace_id]);
-        $is_public = $publicStmt->fetchColumn();
-        
-        if (!$is_public) {
-            // User is not a member and workspace is not public
-            header('Location: collaborative_workspace.php');
-            exit;
-        }
-        
-        // For public workspaces, non-members are viewers
-        $user_role = 'viewer';
-    }
-    
-    // Determine if user can edit
-    $can_edit = ($user_role === 'owner' || $user_role === 'admin' || $user_role === 'contributor');
-    
-    // Get document versions
-    $versionsStmt = $db->prepare("
-        SELECT dv.*, u.full_name as modifier_name
-        FROM document_versions dv
-        JOIN users u ON dv.modified_by = u.id
-        WHERE dv.document_id = :document_id
-        ORDER BY dv.version_number DESC
-        LIMIT 10
-    ");
-    
-    $versionsStmt->execute(['document_id' => $document_id]);
-    $versions = $versionsStmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Get document comments
-    $commentsStmt = $db->prepare("
-        SELECT dc.*, u.full_name as user_name
-        FROM document_comments dc
-        JOIN users u ON dc.user_id = u.id
-        WHERE dc.document_id = :document_id AND dc.parent_id IS NULL
-        ORDER BY dc.created_at DESC
-    ");
-    
-    $commentsStmt->execute(['document_id' => $document_id]);
-    $comments = $commentsStmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Get replies for each comment
-    foreach ($comments as &$comment) {
-        $repliesStmt = $db->prepare("
-            SELECT dc.*, u.full_name as user_name
-            FROM document_comments dc
-            JOIN users u ON dc.user_id = u.id
-            WHERE dc.parent_id = :comment_id
-            ORDER BY dc.created_at ASC
-        ");
-        
-        $repliesStmt->execute(['comment_id' => $comment['id']]);
-        $comment['replies'] = $repliesStmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    // Update user's last active time in this workspace
-    if ($user_role) {
-        $updateStmt = $db->prepare("
-            UPDATE workspace_members
-            SET last_active_at = CURRENT_TIMESTAMP
-            WHERE workspace_id = :workspace_id AND user_id = :user_id
-        ");
-        
-        $updateStmt->execute([
-            'workspace_id' => $workspace_id,
-            'user_id' => $user_id
-        ]);
-    }
-} catch (Exception $e) {
-    $error = "Error loading document: " . $e->getMessage();
-}
+<h3>Pico 4</h3>
+<ul>
+    <li><strong>Price Range:</strong> $429 - $499</li>
+    <li><strong>Resolution:</strong> 2160 x 2160 per eye</li>
+    <li><strong>Field of View:</strong> ~105 degrees</li>
+    <li><strong>Weight:</strong> 586g</li>
+    <li><strong>Battery Life:</strong> 2-3 hours</li>
+    <li><strong>Educational Features:</strong>
+        <ul>
+            <li>Standalone operation</li>
+            <li>Classroom management software</li>
+            <li>Content filtering options</li>
+        </ul>
+    </li>
+    <li><strong>Pros:</strong> Competitive price, good display quality</li>
+    <li><strong>Cons:</strong> Smaller content library than Meta</li>
+</ul>
 
-// Handle POST requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if (!$can_edit && $_POST['action'] !== 'add_comment') {
-        $error = "You don't have permission to edit this document";
-    } else {
-        try {
-            $db = get_db_connection();
-            
-            // Save document changes
-            if ($_POST['action'] === 'save_document' && isset($_POST['content'])) {
-                $content = $_POST['content'];
-                $title = $_POST['title'] ?? $document['title'];
-                $status = $_POST['status'] ?? $document['status'];
-                $change_summary = $_POST['change_summary'] ?? 'Updated document';
-                
-                // Start a transaction
-                $db->beginTransaction();
-                
-                // Update the document
-                $updateStmt = $db->prepare("
-                    UPDATE workspace_documents
-                    SET title = :title, content = :content, status = :status, 
-                        updated_at = CURRENT_TIMESTAMP, version = version + 1
-                    WHERE id = :document_id
-                    RETURNING version
-                ");
-                
-                $updateStmt->execute([
-                    'title' => $title,
-                    'content' => $content,
-                    'status' => $status,
-                    'document_id' => $document_id
-                ]);
-                
-                $new_version = $updateStmt->fetchColumn();
-                
-                // Create a new version record
-                $versionStmt = $db->prepare("
-                    INSERT INTO document_versions
-                    (document_id, version_number, content, modified_by, change_summary)
-                    VALUES (:document_id, :version_number, :content, :modified_by, :change_summary)
-                ");
-                
-                $versionStmt->execute([
-                    'document_id' => $document_id,
-                    'version_number' => $new_version,
-                    'content' => $content,
-                    'modified_by' => $user_id,
-                    'change_summary' => $change_summary
-                ]);
-                
-                // Log activity
-                $activityStmt = $db->prepare("
-                    INSERT INTO workspace_activities
-                    (workspace_id, user_id, activity_type, activity_data, target_id, target_type)
-                    VALUES (:workspace_id, :user_id, 'update_document', :activity_data, :target_id, 'document')
-                ");
-                
-                $activityStmt->execute([
-                    'workspace_id' => $workspace_id,
-                    'user_id' => $user_id,
-                    'activity_data' => json_encode([
-                        'document_title' => $title,
-                        'version' => $new_version
-                    ]),
-                    'target_id' => $document_id
-                ]);
-                
-                // Commit the transaction
-                $db->commit();
-                
-                // Update the document in our local variable
-                $document['title'] = $title;
-                $document['content'] = $content;
-                $document['status'] = $status;
-                $document['version'] = $new_version;
-                
-                $success = "Document saved successfully";
-            }
-            
-            // Add comment
-            else if ($_POST['action'] === 'add_comment' && isset($_POST['comment_text']) && !empty($_POST['comment_text'])) {
-                $comment_text = $_POST['comment_text'];
-                $parent_id = isset($_POST['parent_id']) && !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
-                
-                // Insert comment
-                $stmt = $db->prepare("
-                    INSERT INTO document_comments
-                    (document_id, user_id, comment_text, parent_id)
-                    VALUES (:document_id, :user_id, :comment_text, :parent_id)
-                    RETURNING id
-                ");
-                
-                $stmt->execute([
-                    'document_id' => $document_id,
-                    'user_id' => $user_id,
-                    'comment_text' => $comment_text,
-                    'parent_id' => $parent_id
-                ]);
-                
-                $comment_id = $stmt->fetchColumn();
-                
-                // Log activity
-                $activityStmt = $db->prepare("
-                    INSERT INTO workspace_activities
-                    (workspace_id, user_id, activity_type, activity_data, target_id, target_type)
-                    VALUES (:workspace_id, :user_id, 'add_comment', :activity_data, :target_id, 'comment')
-                ");
-                
-                $activityStmt->execute([
-                    'workspace_id' => $workspace_id,
-                    'user_id' => $user_id,
-                    'activity_data' => json_encode([
-                        'document_title' => $document['title'],
-                        'document_id' => $document_id,
-                        'comment_id' => $comment_id,
-                        'is_reply' => $parent_id ? true : false
-                    ]),
-                    'target_id' => $comment_id
-                ]);
-                
-                // Refresh the page to show the new comment
-                header("Location: document_editor.php?id=$document_id&success=1#comments");
-                exit;
-            }
-        } catch (Exception $e) {
-            if (isset($db) && $db->inTransaction()) {
-                $db->rollBack();
-            }
-            $error = "Error: " . $e->getMessage();
-        }
-    }
-}
+<h2>PC-Connected VR Headsets</h2>
+<h3>Valve Index</h3>
+<ul>
+    <li><strong>Price Range:</strong> $999 (full kit)</li>
+    <li><strong>Resolution:</strong> 1440 x 1600 per eye</li>
+    <li><strong>Field of View:</strong> ~130 degrees</li>
+    <li><strong>Weight:</strong> 809g</li>
+    <li><strong>Educational Features:</strong>
+        <ul>
+            <li>Superior tracking accuracy</li>
+            <li>High-fidelity visuals for detailed simulations</li>
+            <li>Advanced controller input</li>
+        </ul>
+    </li>
+    <li><strong>Pros:</strong> Premium experience, wide field of view</li>
+    <li><strong>Cons:</strong> Expensive, requires powerful PC, complex setup</li>
+</ul>
 
-// Function to format time ago
-function time_ago($datetime, $full = false) {
-    $now = new DateTime;
-    $ago = new DateTime($datetime);
-    $diff = $now->diff($ago);
+<h3>HP Reverb G2</h3>
+<ul>
+    <li><strong>Price Range:</strong> $599</li>
+    <li><strong>Resolution:</strong> 2160 x 2160 per eye</li>
+    <li><strong>Field of View:</strong> ~114 degrees</li>
+    <li><strong>Weight:</strong> 550g</li>
+    <li><strong>Educational Features:</strong>
+        <ul>
+            <li>High resolution for detailed content</li>
+            <li>Windows Mixed Reality integration</li>
+            <li>Compatible with educational STEM software</li>
+        </ul>
+    </li>
+    <li><strong>Pros:</strong> Excellent visual clarity, comfortable for extended use</li>
+    <li><strong>Cons:</strong> Requires PC connection, tracking not as robust as other systems</li>
+</ul>
 
-    $diff->w = floor($diff->d / 7);
-    $diff->d -= $diff->w * 7;
+<h2>Classroom Implementation Considerations</h2>
+<ol>
+    <li><strong>Budget Constraints:</strong> Consider total cost including headsets, supporting hardware, and content licensing</li>
+    <li><strong>Technical Support:</strong> Ensure IT staff are trained to support the chosen platform</li>
+    <li><strong>Content Availability:</strong> Verify educational content availability for your subject areas</li>
+    <li><strong>Space Requirements:</strong> Assess classroom space for safe VR use</li>
+    <li><strong>Hygiene Protocol:</strong> Develop cleaning procedures for shared headsets</li>
+    <li><strong>Accessibility:</strong> Consider options for students with different abilities</li>
+</ol>
 
-    $string = array(
-        'y' => 'year',
-        'm' => 'month',
-        'w' => 'week',
-        'd' => 'day',
-        'h' => 'hour',
-        'i' => 'minute',
-        's' => 'second',
-    );
-    
-    foreach ($string as $k => &$v) {
-        if ($diff->$k) {
-            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
-        } else {
-            unset($string[$k]);
-        }
-    }
+<h2>Recommended Classroom Setups</h2>
+<h3>Budget Option</h3>
+<p>Meta Quest 3 (6 units) with shared classroom use and rotation system</p>
 
-    if (!$full) $string = array_slice($string, 0, 1);
-    return $string ? implode(', ', $string) . ' ago' : 'just now';
-}
+<h3>Premium Option</h3>
+<p>HP Reverb G2 (12 units) connected to capable workstations for detailed scientific visualization</p>
+
+<h3>Hybrid Approach</h3>
+<p>Combination of standalone headsets for general use and PC-connected systems for specialized applications</p>',
+    'workspace_id' => 1,
+    'workspace_name' => 'VR Curriculum Planning',
+    'type' => 'document',
+    'created_by' => 'Dr. Sarah Chen',
+    'created_at' => '2025-04-24',
+    'updated_at' => '2025-04-28',
+    'status' => 'Published',
+    'version' => 3,
+    'collaborators' => [
+        ['id' => 1, 'name' => 'Dr. Sarah Chen', 'avatar' => 'https://via.placeholder.com/32'],
+        ['id' => 2, 'name' => 'John Davis', 'avatar' => 'https://via.placeholder.com/32'],
+        ['id' => 3, 'name' => 'Maria Rodriguez', 'avatar' => 'https://via.placeholder.com/32']
+    ]
+];
+
+// Sample comments
+$comments = [
+    [
+        'id' => 1,
+        'user' => 'John Davis',
+        'user_avatar' => 'https://via.placeholder.com/32',
+        'content' => 'Should we add a section about the accessibility features of each headset?',
+        'time' => '2 days ago',
+        'replies' => [
+            [
+                'id' => 2,
+                'user' => 'Dr. Sarah Chen',
+                'user_avatar' => 'https://via.placeholder.com/32',
+                'content' => 'Great idea, John. Let\'s add that in the next version.',
+                'time' => '1 day ago'
+            ]
+        ]
+    ],
+    [
+        'id' => 3,
+        'user' => 'Maria Rodriguez',
+        'user_avatar' => 'https://via.placeholder.com/32',
+        'content' => 'I think we should highlight which headsets work best for younger students vs. older students.',
+        'time' => '3 days ago',
+        'replies' => []
+    ]
+];
+
+// Document version history
+$versions = [
+    [
+        'id' => 3,
+        'version' => 3,
+        'updated_by' => 'Dr. Sarah Chen',
+        'updated_at' => '2025-04-28',
+        'changes' => 'Added classroom implementation considerations section'
+    ],
+    [
+        'id' => 2,
+        'version' => 2,
+        'updated_by' => 'John Davis',
+        'updated_at' => '2025-04-26',
+        'changes' => 'Added PC-connected headset comparisons'
+    ],
+    [
+        'id' => 1,
+        'version' => 1,
+        'updated_by' => 'Dr. Sarah Chen',
+        'updated_at' => '2025-04-24',
+        'changes' => 'Initial document creation'
+    ]
+];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($document['title'] ?? 'Document'); ?> - iTeachXR</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <title><?php echo $pageTitle; ?></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add Quill Rich Text Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
-        .editor-container {
-            height: calc(100vh - 250px);
-            min-height: 400px;
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        #editor {
-            height: 100%;
+        .main-content {
+            padding: 30px;
+        }
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #e3e6f0;
+            min-height: 100vh;
+        }
+        .document-sidebar {
+            background-color: #f8f9fa;
+            border-left: 1px solid #e3e6f0;
+            height: calc(100vh - 70px);
+            position: sticky;
+            top: 70px;
             overflow-y: auto;
         }
-        .ql-editor {
-            min-height: 100%;
+        .editor-container {
+            background-color: white;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            border-radius: 0.35rem;
         }
-        .comment-container {
-            border-left: 3px solid #0d6efd;
-            padding-left: 15px;
+        .comment-card {
+            border-left: 3px solid #4e73df;
             margin-bottom: 15px;
         }
-        .comment-reply {
-            margin-left: 30px;
-            border-left: 2px solid #6c757d;
-            padding-left: 15px;
+        .reply-card {
+            border-left: 3px solid #1cc88a;
+            margin-left: 25px;
+            margin-bottom: 10px;
         }
-        .document-info {
-            position: sticky;
-            top: 20px;
-        }
-        .editor-toolbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background-color: #fff;
-            border-bottom: 1px solid #dee2e6;
-            padding: 10px 0;
-        }
-        .timeline-item {
-            position: relative;
-            padding-left: 45px;
-            margin-bottom: 20px;
-        }
-        .timeline-marker {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 30px;
-            height: 30px;
-            background-color: #0d6efd;
-            color: white;
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
         }
-        .timeline-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 30px;
-            bottom: -10px;
-            width: 2px;
-            background-color: #dee2e6;
+        .custom-card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 15px 20px;
+        }
+        .collaborator-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: -10px;
+            border: 2px solid #fff;
+        }
+        #editor {
+            height: 600px;
+            font-size: 16px;
+        }
+        .ql-toolbar {
+            border-top-left-radius: 0.35rem;
+            border-top-right-radius: 0.35rem;
+            background-color: #f8f9fa;
+        }
+        .ql-container {
+            border-bottom-left-radius: 0.35rem;
+            border-bottom-right-radius: 0.35rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-indicator.published {
+            background-color: #1cc88a;
+        }
+        .status-indicator.draft {
+            background-color: #f6c23e;
+        }
+        .tab-content {
+            height: calc(100vh - 220px);
+            overflow-y: auto;
+        }
+        .sticky-top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: white;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <?php include('../includes/teacher_navbar.php'); ?>
-    
-    <!-- Main Content -->
-    <div class="container-fluid mt-3 mb-5">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <?php include('../includes/teacher_sidebar.php'); ?>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 d-none d-md-block sidebar p-0">
+            <?php include_once('../includes/teacher_sidebar.php'); ?>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 px-0">
+            <!-- Navbar -->
+            <div class="sticky-top-bar">
+                <?php include_once('../includes/teacher_navbar.php'); ?>
+                
+                <!-- Document Toolbar -->
+                <div class="bg-white py-2 px-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="collaborative_workspace.php">Workspaces</a></li>
+                                <li class="breadcrumb-item"><a href="workspace_detail.php?id=<?php echo $document['workspace_id']; ?>"><?php echo htmlspecialchars($document['workspace_name']); ?></a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($document['name']); ?></li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <?php foreach ($document['collaborators'] as $collaborator): ?>
+                            <img src="<?php echo $collaborator['avatar']; ?>" alt="<?php echo htmlspecialchars($collaborator['name']); ?>" class="collaborator-avatar" data-bs-toggle="tooltip" title="<?php echo htmlspecialchars($collaborator['name']); ?>">
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="dropdown me-2">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="shareDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-share-alt me-1"></i> Share
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="shareDropdown">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i> Invite Collaborators</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-link me-2"></i> Copy Link</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-envelope me-2"></i> Email</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Sharing Settings</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown me-2">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="versionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-history me-1"></i> Version <?php echo $document['version']; ?>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="versionDropdown">
+                                <?php foreach ($versions as $version): ?>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <div class="d-flex justify-content-between">
+                                            <div>Version <?php echo $version['version']; ?> (<?php echo $version['updated_by']; ?>)</div>
+                                            <small class="text-muted"><?php echo $version['updated_at']; ?></small>
+                                        </div>
+                                        <small class="text-muted"><?php echo $version['changes']; ?></small>
+                                    </a>
+                                </li>
+                                <?php endforeach; ?>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-clock me-2"></i> View Version History</a></li>
+                            </ul>
+                        </div>
+                        <div class="me-2">
+                            <span class="badge <?php echo $document['status'] == 'Published' ? 'bg-success' : 'bg-warning'; ?>">
+                                <?php echo $document['status']; ?>
+                            </span>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Save
+                        </button>
+                    </div>
+                </div>
             </div>
             
-            <!-- Main Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <!-- Document Header -->
-                <div class="editor-toolbar mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <a href="workspace_detail.php?id=<?php echo $workspace_id; ?>" class="btn btn-sm btn-outline-secondary me-2">
-                                <i class="fas fa-arrow-left"></i>
-                            </a>
-                            
-                            <?php if ($can_edit): ?>
-                            <input type="text" id="document-title" class="form-control form-control-lg border-0 fw-bold" 
-                                value="<?php echo htmlspecialchars($document['title']); ?>" 
-                                style="max-width: 500px;">
-                            <?php else: ?>
-                            <h1 class="h2 mb-0"><?php echo htmlspecialchars($document['title']); ?></h1>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <div class="d-flex">
-                            <?php if ($can_edit): ?>
-                            <select id="document-status" class="form-select form-select-sm me-2" style="width: 130px;">
-                                <option value="draft" <?php echo $document['status'] === 'draft' ? 'selected' : ''; ?>>Draft</option>
-                                <option value="in_review" <?php echo $document['status'] === 'in_review' ? 'selected' : ''; ?>>In Review</option>
-                                <option value="published" <?php echo $document['status'] === 'published' ? 'selected' : ''; ?>>Published</option>
-                            </select>
-                            <button id="save-button" class="btn btn-primary btn-sm">
-                                <i class="fas fa-save me-1"></i> Save
-                            </button>
-                            <?php else: ?>
-                            <span class="badge <?php echo $document['status'] === 'published' ? 'bg-success' : 'bg-warning text-dark'; ?> p-2">
-                                <?php echo ucfirst(str_replace('_', ' ', $document['status'])); ?>
-                            </span>
-                            <?php endif; ?>
+            <div class="row m-0">
+                <!-- Document Editor -->
+                <div class="col-md-9 p-4">
+                    <div class="editor-container mb-4">
+                        <div id="editor-container">
+                            <div id="editor"><?php echo $document['content']; ?></div>
                         </div>
                     </div>
                 </div>
                 
-                <?php if (isset($error)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php echo $error; ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
-                
-                <?php if (isset($success)): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?php echo $success; ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
-                
-                <?php if (isset($_GET['success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Action completed successfully!
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
-                
-                <!-- Document Content -->
-                <div class="row">
-                    <!-- Editor Column -->
-                    <div class="col-md-8 mb-4">
-                        <!-- Document Editor -->
-                        <div class="card mb-4">
-                            <div class="card-body p-0">
-                                <div class="editor-container">
-                                    <div id="editor"><?php echo $document['content'] ?? ''; ?></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Comments Section -->
-                        <div class="card" id="comments">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">Comments</h5>
-                            </div>
-                            <div class="card-body">
-                                <!-- Comment Form -->
-                                <form method="post" action="" class="mb-4">
-                                    <input type="hidden" name="action" value="add_comment">
-                                    <div class="mb-3">
-                                        <textarea class="form-control" name="comment_text" rows="3" placeholder="Add a comment..." required></textarea>
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-comment me-1"></i> Add Comment
+                <!-- Document Sidebar -->
+                <div class="col-md-3 p-0 document-sidebar">
+                    <div class="sticky-top pt-3">
+                        <ul class="nav nav-tabs nav-fill" id="sidebarTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments" type="button" role="tab" aria-controls="comments" aria-selected="true">
+                                    <i class="fas fa-comments me-1"></i> Comments
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab" aria-controls="ai" aria-selected="false">
+                                    <i class="fas fa-robot me-1"></i> AI Assistant
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content p-3" id="sidebarTabContent">
+                            <!-- Comments Tab -->
+                            <div class="tab-pane fade show active" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+                                <div class="mb-3">
+                                    <textarea class="form-control" rows="3" placeholder="Add a comment..."></textarea>
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="fas fa-comment me-1"></i> Comment
                                         </button>
                                     </div>
-                                </form>
-                                
-                                <!-- Comments List -->
-                                <?php if (empty($comments)): ?>
-                                <div class="text-center py-4">
-                                    <p class="text-muted">No comments yet. Be the first to comment!</p>
                                 </div>
-                                <?php else: ?>
-                                <div class="comments-list">
+                                
+                                <div>
                                     <?php foreach ($comments as $comment): ?>
-                                    <div class="comment-container" id="comment-<?php echo $comment['id']; ?>">
-                                        <div class="d-flex justify-content-between">
-                                            <h6 class="mb-1">
-                                                <?php echo htmlspecialchars($comment['user_name']); ?>
-                                                <?php if ($comment['user_id'] == $user_id): ?>
-                                                <span class="badge bg-light text-dark">You</span>
-                                                <?php endif; ?>
-                                            </h6>
-                                            <small class="text-muted"><?php echo time_ago($comment['created_at']); ?></small>
-                                        </div>
-                                        <p class="mb-2"><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
-                                        
-                                        <div class="mb-3">
-                                            <button class="btn btn-sm btn-link p-0" 
-                                                onclick="toggleReplyForm(<?php echo $comment['id']; ?>)">
-                                                <i class="fas fa-reply me-1"></i> Reply
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Reply Form (hidden by default) -->
-                                        <div id="reply-form-<?php echo $comment['id']; ?>" class="mb-3 d-none">
-                                            <form method="post" action="">
-                                                <input type="hidden" name="action" value="add_comment">
-                                                <input type="hidden" name="parent_id" value="<?php echo $comment['id']; ?>">
-                                                <div class="mb-2">
-                                                    <textarea class="form-control form-control-sm" name="comment_text" rows="2" placeholder="Write a reply..." required></textarea>
+                                    <div class="card comment-card mb-3">
+                                        <div class="card-body py-2">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="<?php echo $comment['user_avatar']; ?>" alt="<?php echo htmlspecialchars($comment['user']); ?>" class="comment-avatar me-2">
+                                                    <strong><?php echo htmlspecialchars($comment['user']); ?></strong>
                                                 </div>
-                                                <div class="text-end">
-                                                    <button type="button" class="btn btn-sm btn-secondary me-1" 
-                                                        onclick="toggleReplyForm(<?php echo $comment['id']; ?>)">
-                                                        Cancel
-                                                    </button>
-                                                    <button type="submit" class="btn btn-sm btn-primary">
-                                                        Reply
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        
-                                        <!-- Replies -->
-                                        <?php if (!empty($comment['replies'])): ?>
-                                        <?php foreach ($comment['replies'] as $reply): ?>
-                                        <div class="comment-reply">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1">
-                                                    <?php echo htmlspecialchars($reply['user_name']); ?>
-                                                    <?php if ($reply['user_id'] == $user_id): ?>
-                                                    <span class="badge bg-light text-dark">You</span>
-                                                    <?php endif; ?>
-                                                </h6>
-                                                <small class="text-muted"><?php echo time_ago($reply['created_at']); ?></small>
+                                                <small class="text-muted"><?php echo $comment['time']; ?></small>
                                             </div>
-                                            <p class="mb-2"><?php echo nl2br(htmlspecialchars($reply['comment_text'])); ?></p>
+                                            <p class="mb-2"><?php echo htmlspecialchars($comment['content']); ?></p>
+                                            <div class="d-flex">
+                                                <button class="btn btn-sm btn-link p-0">Reply</button>
+                                                <span class="mx-2">•</span>
+                                                <button class="btn btn-sm btn-link p-0">Resolve</button>
+                                            </div>
+                                            
+                                            <?php if(!empty($comment['replies'])): ?>
+                                                <?php foreach ($comment['replies'] as $reply): ?>
+                                                <div class="card reply-card mt-2">
+                                                    <div class="card-body py-2">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="<?php echo $reply['user_avatar']; ?>" alt="<?php echo htmlspecialchars($reply['user']); ?>" class="comment-avatar me-2">
+                                                                <strong><?php echo htmlspecialchars($reply['user']); ?></strong>
+                                                            </div>
+                                                            <small class="text-muted"><?php echo $reply['time']; ?></small>
+                                                        </div>
+                                                        <p class="mb-0"><?php echo htmlspecialchars($reply['content']); ?></p>
+                                                    </div>
+                                                </div>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </div>
-                                        <?php endforeach; ?>
-                                        <?php endif; ?>
                                     </div>
                                     <?php endforeach; ?>
                                 </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Sidebar Column -->
-                    <div class="col-md-4">
-                        <div class="document-info">
-                            <!-- Document Info -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Document Info</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p class="mb-1">
-                                        <strong>Workspace:</strong> 
-                                        <a href="workspace_detail.php?id=<?php echo $workspace_id; ?>">
-                                            <?php echo htmlspecialchars($document['workspace_title']); ?>
-                                        </a>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>Type:</strong> 
-                                        <?php echo ucfirst(str_replace('_', ' ', $document['document_type'])); ?>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>Created by:</strong> 
-                                        <?php echo htmlspecialchars($document['creator_name']); ?>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>Created:</strong> 
-                                        <?php echo date('F j, Y', strtotime($document['created_at'])); ?>
-                                    </p>
-                                    <p class="mb-1">
-                                        <strong>Last updated:</strong> 
-                                        <?php echo date('F j, Y g:i A', strtotime($document['updated_at'])); ?>
-                                    </p>
-                                    <p class="mb-3">
-                                        <strong>Current version:</strong> 
-                                        <?php echo $document['version']; ?>
-                                    </p>
-                                    
-                                    <?php if ($can_edit): ?>
-                                    <div class="mb-3">
-                                        <label for="change-summary" class="form-label">Change Summary</label>
-                                        <input type="text" class="form-control form-control-sm" id="change-summary" 
-                                            placeholder="Describe your changes">
-                                    </div>
-                                    <?php endif; ?>
-                                    
-                                    <div class="d-grid gap-2">
-                                        <?php if ($can_edit): ?>
-                                        <button id="save-button-sidebar" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i> Save Document
-                                        </button>
-                                        <?php endif; ?>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#versionsModal">
-                                            <i class="fas fa-history me-1"></i> View Version History
-                                        </a>
-                                    </div>
-                                </div>
                             </div>
                             
-                            <!-- AI Suggestions (optional) -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">AI Suggestions</h5>
+                            <!-- AI Assistant Tab -->
+                            <div class="tab-pane fade" id="ai" role="tabpanel" aria-labelledby="ai-tab">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="btn-group" role="group" aria-label="AI Actions">
+                                        <button type="button" class="btn btn-outline-primary">Improve</button>
+                                        <button type="button" class="btn btn-outline-primary">Summarize</button>
+                                        <button type="button" class="btn btn-outline-primary">Check</button>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <button class="btn btn-outline-primary btn-sm w-100" id="ai-analyze-btn">
-                                            <i class="fas fa-magic me-1"></i> Analyze Content
+                                
+                                <div class="mb-3">
+                                    <textarea class="form-control" rows="3" placeholder="Ask AI for help with this document..."></textarea>
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="fas fa-robot me-1"></i> Ask AI
                                         </button>
                                     </div>
-                                    <div id="ai-suggestions" class="d-none">
-                                        <h6>Content Analysis</h6>
-                                        <ul class="small">
-                                            <li>Consider adding more engagement activities</li>
-                                            <li>Objectives could be more measurable</li>
-                                            <li>Good alignment between activities and assessments</li>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light py-2">
+                                        <h6 class="mb-0">AI Suggestions</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6>Content Enhancement Ideas</h6>
+                                        <ul class="mb-0">
+                                            <li>Add a comparison table for quick reference</li>
+                                            <li>Include information about software compatibility</li>
+                                            <li>Add a section about future trends in educational VR</li>
                                         </ul>
-                                        
-                                        <h6 class="mt-3">XR Enhancement Ideas</h6>
-                                        <p class="small">Try incorporating 3D models for the key concepts, or a virtual field trip to illustrate real-world applications.</p>
-                                        
-                                        <div class="d-grid">
-                                            <button class="btn btn-sm btn-outline-secondary" id="generate-more-btn">
-                                                Generate More Ideas
-                                            </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light py-2">
+                                        <h6 class="mb-0">Related Resources</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-file-pdf text-danger me-2 fa-lg"></i>
+                                            <div>
+                                                <div>VR in Education Research Paper</div>
+                                                <small class="text-muted">PDF - Workspace: Research Repository</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-file-alt text-primary me-2 fa-lg"></i>
+                                            <div>
+                                                <div>XR Technology Budget Proposal</div>
+                                                <small class="text-muted">Document - Workspace: Administration</small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -644,85 +490,14 @@ function time_ago($datetime, $full = false) {
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
-    </div>
-    
-    <!-- Versions Modal -->
-    <div class="modal fade" id="versionsModal" tabindex="-1" aria-labelledby="versionsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="versionsModalLabel">Version History</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <?php if (empty($versions)): ?>
-                    <p class="text-center">No version history available</p>
-                    <?php else: ?>
-                    <div class="timeline">
-                        <?php foreach ($versions as $version): ?>
-                        <div class="timeline-item">
-                            <div class="timeline-marker">
-                                <?php echo $version['version_number']; ?>
-                            </div>
-                            <div class="timeline-content">
-                                <h6 class="mb-1">Version <?php echo $version['version_number']; ?></h6>
-                                <p class="mb-1 small">
-                                    <?php echo htmlspecialchars($version['change_summary']); ?>
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
-                                        <?php echo htmlspecialchars($version['modifier_name']); ?> · 
-                                        <?php echo date('M j, Y g:i A', strtotime($version['created_at'])); ?>
-                                    </small>
-                                    <?php if ($can_edit && $version['version_number'] != $document['version']): ?>
-                                    <button class="btn btn-sm btn-outline-secondary revert-btn" 
-                                        data-version="<?php echo $version['version_number']; ?>">
-                                        Restore
-                                    </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Save Confirmation Modal -->
-    <div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="saveConfirmModalLabel">Save Document</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Your changes will be saved and visible to all workspace members.</p>
-                    <div class="mb-3">
-                        <label for="save-change-summary" class="form-label">Change Summary</label>
-                        <input type="text" class="form-control" id="save-change-summary" 
-                            placeholder="Describe your changes">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirm-save-btn">Save Document</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <script>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
     // Initialize Quill editor
     var quill = new Quill('#editor', {
         theme: 'snow',
@@ -730,145 +505,38 @@ function time_ago($datetime, $full = false) {
             toolbar: [
                 [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
                 ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
                 [{ 'indent': '-1'}, { 'indent': '+1' }],
                 [{ 'align': [] }],
                 ['link', 'image'],
                 ['clean']
             ]
         },
-        placeholder: 'Write your document content here...',
-        <?php if (!$can_edit): ?>
-        readOnly: true
-        <?php endif; ?>
+        placeholder: 'Start writing your document...'
     });
     
-    <?php if ($can_edit): ?>
-    // Save document functionality
-    document.getElementById('save-button').addEventListener('click', function() {
-        // Show save confirmation modal
-        var changeSummary = document.getElementById('change-summary').value;
-        document.getElementById('save-change-summary').value = changeSummary;
-        var saveModal = new bootstrap.Modal(document.getElementById('saveConfirmModal'));
-        saveModal.show();
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
     });
     
-    document.getElementById('save-button-sidebar').addEventListener('click', function() {
-        // Show save confirmation modal
-        var changeSummary = document.getElementById('change-summary').value;
-        document.getElementById('save-change-summary').value = changeSummary;
-        var saveModal = new bootstrap.Modal(document.getElementById('saveConfirmModal'));
-        saveModal.show();
-    });
-    
-    document.getElementById('confirm-save-btn').addEventListener('click', function() {
-        // Get form values
-        var title = document.getElementById('document-title').value;
-        var status = document.getElementById('document-status').value;
-        var content = quill.root.innerHTML;
-        var changeSummary = document.getElementById('save-change-summary').value;
+    // Autosave functionality
+    var lastEdit = new Date();
+    quill.on('text-change', function() {
+        lastEdit = new Date();
+        document.getElementById('autosaveStatus').innerText = 'Editing...';
         
-        // Create a form and submit
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '';
-        
-        // Action
-        var actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'save_document';
-        form.appendChild(actionInput);
-        
-        // Title
-        var titleInput = document.createElement('input');
-        titleInput.type = 'hidden';
-        titleInput.name = 'title';
-        titleInput.value = title;
-        form.appendChild(titleInput);
-        
-        // Status
-        var statusInput = document.createElement('input');
-        statusInput.type = 'hidden';
-        statusInput.name = 'status';
-        statusInput.value = status;
-        form.appendChild(statusInput);
-        
-        // Content
-        var contentInput = document.createElement('input');
-        contentInput.type = 'hidden';
-        contentInput.name = 'content';
-        contentInput.value = content;
-        form.appendChild(contentInput);
-        
-        // Change Summary
-        var summaryInput = document.createElement('input');
-        summaryInput.type = 'hidden';
-        summaryInput.name = 'change_summary';
-        summaryInput.value = changeSummary || 'Updated document';
-        form.appendChild(summaryInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    });
-    
-    // Version revert functionality
-    document.querySelectorAll('.revert-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to restore this version? Unsaved changes will be lost.')) {
-                var versionNumber = this.getAttribute('data-version');
-                // Create a form and submit
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '';
-                
-                // Action
-                var actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'revert_version';
-                form.appendChild(actionInput);
-                
-                // Version Number
-                var versionInput = document.createElement('input');
-                versionInput.type = 'hidden';
-                versionInput.name = 'version_number';
-                versionInput.value = versionNumber;
-                form.appendChild(versionInput);
-                
-                document.body.appendChild(form);
-                form.submit();
+        // Simulating autosave after 2 seconds of inactivity
+        setTimeout(function() {
+            var now = new Date();
+            if ((now - lastEdit) >= 2000) {
+                document.getElementById('autosaveStatus').innerText = 'All changes saved';
             }
-        });
+        }, 2000);
     });
-    <?php endif; ?>
-    
-    // Toggle reply form
-    function toggleReplyForm(commentId) {
-        var replyForm = document.getElementById('reply-form-' + commentId);
-        if (replyForm.classList.contains('d-none')) {
-            replyForm.classList.remove('d-none');
-        } else {
-            replyForm.classList.add('d-none');
-        }
-    }
-    
-    // AI Suggestions toggle
-    document.getElementById('ai-analyze-btn').addEventListener('click', function() {
-        var suggestionsDiv = document.getElementById('ai-suggestions');
-        if (suggestionsDiv.classList.contains('d-none')) {
-            suggestionsDiv.classList.remove('d-none');
-            this.innerHTML = '<i class="fas fa-times me-1"></i> Hide Analysis';
-        } else {
-            suggestionsDiv.classList.add('d-none');
-            this.innerHTML = '<i class="fas fa-magic me-1"></i> Analyze Content';
-        }
-    });
-    
-    document.getElementById('generate-more-btn').addEventListener('click', function() {
-        // In a real implementation, this would call the AI service
-        alert('This feature will be implemented in the future using the OpenAI integration.');
-    });
-    </script>
+</script>
 </body>
 </html>
