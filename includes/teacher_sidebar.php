@@ -1,65 +1,73 @@
-<div class="position-sticky">
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : ''; ?>" href="/teacher/dashboard.php">
+<div class="position-sticky p-3">
+    <div class="d-flex align-items-center mb-4 px-2">
+        <img src="/images/logo.svg" alt="iTeachXR Logo" height="40" class="me-2">
+        <span class="fs-4 fw-bold text-white">iTeachXR</span>
+    </div>
+    
+    <ul class="nav flex-column mb-4">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/dashboard.php">
                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'courses.php' ? 'active' : ''; ?>" href="/teacher/courses.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'courses.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/courses.php">
                 <i class="fas fa-book me-2"></i> My Courses
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) === 'collaborative_workspace.php' || basename($_SERVER['PHP_SELF']) === 'workspace_detail.php' || basename($_SERVER['PHP_SELF']) === 'document_editor.php') ? 'active' : ''; ?>" href="/teacher/collaborative_workspace.php">
-                <i class="fas fa-users-gear me-2"></i> Collaborative Workspace
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo (basename($_SERVER['PHP_SELF']) === 'collaborative_workspace.php' || basename($_SERVER['PHP_SELF']) === 'workspace_detail.php' || basename($_SERVER['PHP_SELF']) === 'document_editor.php') ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/collaborative_workspace.php">
+                <i class="fas fa-users me-2"></i> Collaborative Workspace
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'ai_demo.php' ? 'active' : ''; ?>" href="/ai_demo.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'ai_demo.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/ai_demo.php">
                 <i class="fas fa-robot me-2"></i> AI Features
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'assignments.php' ? 'active' : ''; ?>" href="/teacher/assignments.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'assignments.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/assignments.php">
                 <i class="fas fa-tasks me-2"></i> Assignments
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'students.php' ? 'active' : ''; ?>" href="/teacher/students.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'students.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/students.php">
                 <i class="fas fa-user-graduate me-2"></i> Students
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'grades.php' ? 'active' : ''; ?>" href="/teacher/grades.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'grades.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/grades.php">
                 <i class="fas fa-chart-line me-2"></i> Grades
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'resources.php' ? 'active' : ''; ?>" href="/teacher/resources.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'resources.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/resources.php">
                 <i class="fas fa-folder-open me-2"></i> Resources
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : ''; ?>" href="/teacher/profile.php">
+        <li class="nav-item mb-1">
+            <a class="nav-link text-white rounded <?php echo basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active bg-white bg-opacity-25' : ''; ?>" href="/teacher/profile.php">
                 <i class="fas fa-user-circle me-2"></i> Profile
             </a>
         </li>
     </ul>
     
-    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-        <span>Quick Links</span>
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-2 text-white text-opacity-75 fw-bold">
+        <span>Quick Tools</span>
+        <i class="fas fa-bolt"></i>
     </h6>
-    <ul class="nav flex-column mb-2">
-        <li class="nav-item">
-            <a class="nav-link" href="/ai_demo.php?section=course_structure">
+    <div class="px-3">
+        <div class="d-grid gap-2">
+            <a class="btn btn-sm btn-light text-primary fw-semibold" href="/ai_demo.php?section=course_structure">
                 <i class="fas fa-magic me-2"></i> Generate Course Structure
             </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/teacher/collaborative_workspace.php">
+            <a class="btn btn-sm btn-light text-primary fw-semibold" href="/teacher/collaborative_workspace.php">
                 <i class="fas fa-file-alt me-2"></i> Lesson Plans
             </a>
-        </li>
-    </ul>
+        </div>
+    </div>
+    
+    <div class="mt-auto pt-5 text-center text-white-50 small">
+        <p>iTeachXR v1.0<br>Making teaching delightful</p>
+    </div>
 </div>

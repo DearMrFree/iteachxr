@@ -86,49 +86,139 @@ $recentActivity = [
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --primary-color: #B91539;
+            --primary-light: #e42447;
+            --primary-dark: #8c1029;
+            --secondary-color: #4b6cb7;
+            --accent-color: #1cc88a;
+            --text-color: #333;
+            --light-text: #6c757d;
+            --white: #fff;
+            --light-bg: #f8f9fa;
+            --border-color: #e3e6f0;
         }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+        
         .main-content {
             padding: 30px;
         }
+        
         .sidebar {
-            background-color: #f8f9fa;
-            border-right: 1px solid #e3e6f0;
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-right: 1px solid var(--border-color);
             min-height: 100vh;
+            color: var(--white);
         }
+        
         .workspace-card {
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
             margin-bottom: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
+        
         .workspace-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
         }
+        
+        .workspace-card .card-title a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .workspace-card .card-title a:hover {
+            color: var(--primary-light);
+        }
+        
         .tag {
-            font-size: 0.8rem;
-            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 50px;
             margin-right: 5px;
-            background-color: #e9ecef;
+            margin-bottom: 5px;
+            display: inline-block;
+            background-color: rgba(75, 108, 183, 0.1);
+            color: var(--secondary-color);
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
+        
+        .tag:hover {
+            background-color: rgba(75, 108, 183, 0.2);
+        }
+        
         .activity-item {
             padding: 15px;
-            border-left: 3px solid #4e73df;
-            margin-bottom: 10px;
-            background-color: white;
-            border-radius: 0 5px 5px 0;
+            border-left: 3px solid var(--primary-color);
+            margin-bottom: 15px;
+            background-color: var(--white);
+            border-radius: 0 8px 8px 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
+        
+        .activity-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transform: translateX(3px);
+        }
+        
         .navbar {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        
         .custom-card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e3e6f0;
+            background-color: var(--light-bg);
+            border-bottom: 1px solid var(--border-color);
             padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            border-color: var(--primary-light);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
     </style>
 </head>
