@@ -488,8 +488,8 @@ $recentActivity = [
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <small class="text-muted">Created: <?php echo $workspace['created_at']; ?></small>
                                                 <div>
-                                                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='workspace_detail.php?id=<?php echo $workspace['id']; ?>'">
-                                                        <i class="fas fa-arrow-right"></i>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='workspace_detail.php?id=<?php echo $workspace['id']; ?>'" aria-label="View <?php echo htmlspecialchars($workspace['name']); ?> workspace details">
+                                                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -607,12 +607,80 @@ $recentActivity = [
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Create Workspace</button>
+                <button type="button" class="btn btn-primary" aria-label="Create and save new workspace">Create Workspace</button>
             </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Modal Accessibility Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the modal element
+        const modal = document.getElementById('createWorkspaceModal');
+        
+        if (modal) {
+            // Get all focusable elements in the modal
+            const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            
+            // Trap focus in modal
+            modal.addEventListener('keydown', function(e) {
+                // If tab key is pressed
+                if (e.key === 'Tab') {
+                    // If shift key is also pressed
+                    if (e.shiftKey) {
+                        // If we're on the first focusable element, loop to the last
+                        if (document.activeElement === firstElement) {
+                            lastElement.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        // If we're on the last focusable element, loop to the first
+                        if (document.activeElement === lastElement) {
+                            firstElement.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+                
+                // Close modal on escape key
+                if (e.key === 'Escape') {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                }
+            });
+            
+            // Set focus on first element when modal opens
+            modal.addEventListener('shown.bs.modal', function() {
+                firstElement.focus();
+            });
+            
+            // Return focus to the element that opened the modal
+            let lastFocusedElement = null;
+            document.querySelector('[data-bs-target="#createWorkspaceModal"]').addEventListener('click', function() {
+                lastFocusedElement = this;
+            });
+            
+            modal.addEventListener('hidden.bs.modal', function() {
+                if (lastFocusedElement) {
+                    lastFocusedElement.focus();
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Accessibility Controls -->
+<?php echo get_accessibility_controls($accessibility_settings); ?>
+<?php echo get_accessibility_toggle(); ?>
+
+<!-- Accessibility JavaScript -->
+<?php echo get_accessibility_javascript(); ?>
 </body>
 </html>
