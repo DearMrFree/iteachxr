@@ -1,7 +1,7 @@
 <div class="position-sticky p-3">
     <div class="d-flex align-items-center mb-4 px-2">
-        <img src="/images/logo.svg" alt="iTeachXR Logo" height="40" class="me-2">
-        <span class="fs-4 fw-bold text-white">iTeachXR</span>
+        <img src="/images/logo-royal.svg" alt="iTeachXR Logo" height="48" class="me-2">
+        <span class="fs-4 fw-bold text-white" style="font-family: 'Playfair Display', serif;">iTeachXR</span>
     </div>
     
     <ul class="nav flex-column mb-4">
@@ -58,16 +58,16 @@
     </h6>
     <div class="px-3">
         <div class="d-grid gap-2">
-            <a class="btn btn-sm btn-light text-primary fw-semibold" href="/ai_demo.php?section=course_structure">
-                <i class="fas fa-magic me-2"></i> Generate Course Structure
+            <a class="btn btn-sm btn-outline-light border-2 fw-semibold" href="/ai_demo.php?section=course_structure" style="color:#F9A602; border-color:#F9A602;">
+                <i class="fas fa-crown me-2"></i> Generate Course Structure
             </a>
-            <a class="btn btn-sm btn-light text-primary fw-semibold" href="/teacher/collaborative_workspace.php">
+            <a class="btn btn-sm btn-outline-light border-2 fw-semibold" href="/teacher/collaborative_workspace.php" style="color:#F9A602; border-color:#F9A602;">
                 <i class="fas fa-file-alt me-2"></i> Lesson Plans
             </a>
         </div>
     </div>
     
-    <div class="mt-auto pt-5 text-center text-white-50 small">
-        <p>iTeachXR v1.0<br>Making teaching delightful</p>
+    <div class="mt-auto pt-5 text-center small">
+        <p style="color:#F9A602; font-family: 'Playfair Display', serif; font-style: italic;">iTeachXR v1.0<br>Excellence in Education</p>
     </div>
 </div>
