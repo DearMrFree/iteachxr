@@ -15,6 +15,10 @@ header('Content-Type: application/json');
  * @return array The command result
  */
 function execute_ai_helper($command, $args = []) {
+    // Set the OPENAI_API_KEY environment variable directly for the process
+    $env = $_ENV;
+    $env['OPENAI_API_KEY'] = getenv('OPENAI_API_KEY');
+    
     // Construct the command
     $cmd = escapeshellcmd('python3 ' . dirname(__DIR__) . '/ai/openai_helper.py ' . $command);
     
@@ -23,8 +27,38 @@ function execute_ai_helper($command, $args = []) {
         $cmd .= ' ' . escapeshellarg($arg);
     }
     
-    // Execute the command
-    $output = shell_exec($cmd);
+    // Set up the descriptors for proc_open
+    $descriptorspec = [
+        0 => ["pipe", "r"],  // stdin
+        1 => ["pipe", "w"],  // stdout
+        2 => ["pipe", "w"]   // stderr
+    ];
+    
+    // Open the process with environment variables
+    $process = proc_open($cmd, $descriptorspec, $pipes, NULL, $env);
+    
+    if (is_resource($process)) {
+        // Close unused stdin
+        fclose($pipes[0]);
+        
+        // Read stdout
+        $output = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        
+        // Read stderr (for debugging)
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        
+        // Close the process
+        $return_value = proc_close($process);
+        
+        // If there's an error, log it for debugging
+        if ($return_value !== 0) {
+            error_log("AI helper error ($return_value): $stderr");
+        }
+    } else {
+        return ['error' => 'Failed to execute AI helper process'];
+    }
     
     // Parse the result
     if ($output) {
@@ -46,7 +80,7 @@ function execute_ai_helper($command, $args = []) {
         return $result;
     }
     
-    return ['error' => 'Failed to execute AI helper'];
+    return ['error' => 'Failed to execute AI helper: No output received'];
 }
 
 /**

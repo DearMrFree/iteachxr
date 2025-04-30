@@ -7,20 +7,44 @@ import sys
 import openai
 from openai import OpenAI
 from dotenv import load_dotenv
+import os.path
 
-# Load environment variables from .env file if it exists
-load_dotenv()
+# First try to load from .env file directly
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+api_key = None
 
-# Initialize OpenAI client
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    print(json.dumps({"error": "OpenAI API key not found in environment variables", "request_api_key": True}))
+# Try different methods to find the API key
+if os.path.exists(env_path):
+    # Try to read from .env file directly
+    with open(env_path, 'r') as f:
+        for line in f:
+            if line.strip() and not line.strip().startswith('#'):
+                key, value = line.strip().split('=', 1)
+                if key == 'OPENAI_API_KEY' and value and not value.startswith('${'):
+                    api_key = value
+                    break
+
+# If direct file read didn't work, try loading environment variables
+if not api_key:
+    load_dotenv()
+    api_key = os.environ.get("OPENAI_API_KEY")
+
+# Fallback to a hardcoded key path if the environment variable doesn't work
+if not api_key:
+    key_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'openai.key')
+    if os.path.exists(key_path):
+        with open(key_path, 'r') as f:
+            api_key = f.read().strip()
+
+# If we still don't have a key, report an error
+if not api_key:
+    print(json.dumps({"error": "OpenAI API key not found. Please add your key to the .env file or environment variables.", "request_api_key": True}))
     sys.exit(1)
 
-# In a production environment, we'd validate the API key
+# In a production environment, we'd validate the API key more thoroughly
 # For now, we'll just initialize the client
 try:
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    client = OpenAI(api_key=api_key)
 except Exception as e:
     print(json.dumps({"error": f"Failed to initialize OpenAI client: {str(e)}", "request_api_key": True}))
     sys.exit(1)
