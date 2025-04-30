@@ -162,6 +162,20 @@ $pageTitle = "AI Features Demo - iTeachXR";
                                 <p class="mt-3">Generating course structure...</p>
                             </div>
                             <div id="course-structure-content"></div>
+                            <div id="api-key-instructions" class="d-none mt-4">
+                                <div class="alert alert-info">
+                                    <h5>Need an OpenAI API key?</h5>
+                                    <p>To use AI features in iTeachXR, you'll need an OpenAI API key with available quota.</p>
+                                    <ol>
+                                        <li>Sign up at <a href="https://platform.openai.com/signup" target="_blank">OpenAI Platform</a></li>
+                                        <li>Visit the <a href="https://platform.openai.com/api-keys" target="_blank">API Keys page</a></li>
+                                        <li>Create a new secret key</li>
+                                        <li>Copy the API key (it starts with "sk-")</li>
+                                        <li>Provide it to your iTeachXR administrator</li>
+                                    </ol>
+                                    <p>Once the API key is added to the system, all AI features will be available.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
