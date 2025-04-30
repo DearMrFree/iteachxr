@@ -6,15 +6,15 @@
 $CFG = new stdClass();
 $CFG->dbtype    = 'pgsql';
 $CFG->dblibrary = 'pdo';
-$CFG->dbhost    = '127.0.0.1';
-$CFG->dbname    = 'replit_db';
-$CFG->dbuser    = getenv('DB_USER') ?: 'replit';
-$CFG->dbpass    = getenv('DB_PASSWORD') ?: '';
-$CFG->prefix    = 'mdl_';
+$CFG->dbhost    = getenv('PGHOST');
+$CFG->dbname    = getenv('PGDATABASE');
+$CFG->dbuser    = getenv('PGUSER');
+$CFG->dbpass    = getenv('PGPASSWORD');
+$CFG->prefix    = '';
 $CFG->dboptions = array(
     'dbpersist' => false,
     'dbsocket'  => false,
-    'dbport'    => '',
+    'dbport'    => getenv('PGPORT'),
 );
 
 // Replit-specific paths
@@ -70,5 +70,5 @@ $CFG->aiFeatures = [
     'chatbot_assistant' => true
 ];
 
-// Required Moodle setup
-require_once($CFG->dirroot . '/lib/setup.php');
+// Include the database connection file
+require_once('lib/db_connection.php');
