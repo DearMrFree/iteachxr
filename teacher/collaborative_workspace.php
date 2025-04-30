@@ -1,5 +1,8 @@
 <?php
 // Teacher Collaborative Workspace
+// Include accessibility helper functions
+require_once('../includes/accessibility.php');
+
 $pageTitle = "Collaborative Workspace - iTeachXR";
 $user = [
     'id' => 1,
@@ -7,6 +10,10 @@ $user = [
     'email' => 'sarah.chen@example.edu',
     'role' => 'teacher'
 ];
+
+// Get user's accessibility settings
+$accessibility_settings = get_user_accessibility_settings();
+$accessibility_classes = get_accessibility_classes($accessibility_settings);
 
 // Sample workspaces data
 $workspaces = [
@@ -82,9 +89,14 @@ $recentActivity = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="iTeachXR Collaborative Workspace - Create and share educational resources with colleagues">
     <title><?php echo $pageTitle; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Accessibility CSS -->
+    <?php echo get_accessibility_css($accessibility_settings); ?>
+    <?php echo get_accessibility_ui_css(); ?>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
         
@@ -394,7 +406,8 @@ $recentActivity = [
         }
     </style>
 </head>
-<body>
+<body class="<?php echo $accessibility_classes; ?>">
+<?php echo get_skip_to_content_link(); ?>
 
 <div class="container-fluid">
     <div class="row">
@@ -404,7 +417,7 @@ $recentActivity = [
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-10 main-content">
+        <div class="col-md-10 main-content" role="main" id="main-content">
             <!-- Navbar -->
             <?php include_once('../includes/teacher_navbar.php'); ?>
             
@@ -413,8 +426,8 @@ $recentActivity = [
                     <h1 class="h3 mb-2 text-primary" style="font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.5px;">Collaborative Workspace</h1>
                     <p class="text-muted" style="max-width: 700px; line-height: 1.5;">Work together with colleagues to create and share educational resources for immersive learning experiences</p>
                 </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createWorkspaceModal">
-                    <i class="fas fa-plus me-2"></i> New Workspace
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createWorkspaceModal" aria-label="Create New Workspace">
+                    <i class="fas fa-plus me-2" aria-hidden="true"></i> New Workspace
                 </button>
             </div>
             
@@ -438,9 +451,12 @@ $recentActivity = [
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" placeholder="Search workspaces..." aria-label="Search workspaces">
-                                <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                            <div class="input-group mb-3" role="search">
+                                <label for="workspaceSearch" class="sr-only">Search workspaces</label>
+                                <input type="text" id="workspaceSearch" class="form-control" placeholder="Search workspaces..." aria-label="Search workspaces">
+                                <button class="btn btn-outline-secondary" type="button" aria-label="Search">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                </button>
                             </div>
                             
                             <div class="row">
@@ -522,17 +538,17 @@ $recentActivity = [
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary">
-                                    <i class="fas fa-file-alt me-2"></i> Create New Document
+                                <button class="btn btn-outline-primary" aria-label="Create new document">
+                                    <i class="fas fa-file-alt me-2" aria-hidden="true"></i> Create New Document
                                 </button>
-                                <button class="btn btn-outline-primary">
-                                    <i class="fas fa-user-plus me-2"></i> Invite Colleagues
+                                <button class="btn btn-outline-primary" aria-label="Invite colleagues to collaborate">
+                                    <i class="fas fa-user-plus me-2" aria-hidden="true"></i> Invite Colleagues
                                 </button>
-                                <button class="btn btn-outline-primary">
-                                    <i class="fas fa-cloud-upload-alt me-2"></i> Upload Resources
+                                <button class="btn btn-outline-primary" aria-label="Upload educational resources">
+                                    <i class="fas fa-cloud-upload-alt me-2" aria-hidden="true"></i> Upload Resources
                                 </button>
-                                <button class="btn btn-outline-primary">
-                                    <i class="fas fa-magic me-2"></i> Generate with AI
+                                <button class="btn btn-outline-primary" aria-label="Generate content with AI">
+                                    <i class="fas fa-magic me-2" aria-hidden="true"></i> Generate with AI
                                 </button>
                             </div>
                         </div>
