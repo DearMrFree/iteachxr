@@ -7,6 +7,33 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        <style>
+            .navbar .nav-link {
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                margin: 0 2px;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                position: relative;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            }
+            
+            .navbar .nav-link:hover {
+                color: #FFFFFF !important;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .navbar .nav-link.active {
+                background-color: rgba(255, 255, 255, 0.15);
+                color: #FFFFFF !important;
+                box-shadow: 0 2px 0 #F9A602;
+            }
+            
+            .navbar .nav-link i {
+                color: #F9A602;
+            }
+        </style>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">

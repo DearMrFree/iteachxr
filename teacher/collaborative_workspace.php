@@ -410,8 +410,8 @@ $recentActivity = [
             
             <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
                 <div>
-                    <h1 class="h3 mb-0 text-gray-800">Collaborative Workspace</h1>
-                    <p class="text-muted">Work together with colleagues to create and share educational resources</p>
+                    <h1 class="h3 mb-2 text-primary" style="font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.5px;">Collaborative Workspace</h1>
+                    <p class="text-muted" style="max-width: 700px; line-height: 1.5;">Work together with colleagues to create and share educational resources for immersive learning experiences</p>
                 </div>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createWorkspaceModal">
                     <i class="fas fa-plus me-2"></i> New Workspace
@@ -423,7 +423,7 @@ $recentActivity = [
                 <div class="col-lg-8">
                     <div class="card shadow mb-4">
                         <div class="card-header custom-card-header d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">My Workspaces</h6>
+                            <h6 class="m-0 font-weight-bold text-primary" style="font-family: 'Playfair Display', serif; letter-spacing: 0.5px; font-size: 1.1rem;">My Workspaces</h6>
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="workspaceFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     Filter
@@ -490,7 +490,7 @@ $recentActivity = [
                 <div class="col-lg-4">
                     <div class="card shadow mb-4">
                         <div class="card-header custom-card-header">
-                            <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
+                            <h6 class="m-0 font-weight-bold text-primary" style="font-family: 'Playfair Display', serif; letter-spacing: 0.5px; font-size: 1.1rem;">Recent Activity</h6>
                         </div>
                         <div class="card-body">
                             <?php foreach ($recentActivity as $activity): ?>
@@ -518,7 +518,7 @@ $recentActivity = [
                     <!-- Quick Actions Card -->
                     <div class="card shadow">
                         <div class="card-header custom-card-header">
-                            <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                            <h6 class="m-0 font-weight-bold text-primary" style="font-family: 'Playfair Display', serif; letter-spacing: 0.5px; font-size: 1.1rem;">Quick Actions</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-grid gap-2">
@@ -547,8 +547,8 @@ $recentActivity = [
 <div class="modal fade" id="createWorkspaceModal" tabindex="-1" aria-labelledby="createWorkspaceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createWorkspaceModalLabel">Create New Workspace</h5>
+            <div class="modal-header" style="background: linear-gradient(145deg, #ffffff, #f8f7fa); border-bottom: 1px solid var(--border-color);">
+                <h5 class="modal-title text-primary" id="createWorkspaceModalLabel" style="font-family: 'Playfair Display', serif; font-weight: 600; letter-spacing: 0.5px;">Create New Workspace</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
