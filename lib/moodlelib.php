@@ -9,7 +9,7 @@ defined('MOODLE_INTERNAL') || die();
  * Returns the current user record
  * @return stdClass current user object
  */
-function get_current_user() {
+function get_iteachxr_current_user() {
     global $USER;
     return $USER;
 }
