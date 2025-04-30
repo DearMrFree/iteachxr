@@ -129,9 +129,11 @@ $pageTitle = "AI Features Demo - iTeachXR";
                                 <div class="col-md-6">
                                     <label for="course-level" class="form-label">Educational Level</label>
                                     <select class="form-select" id="course-level">
+                                        <option value="elementary">Elementary School</option>
+                                        <option value="middle">Middle School</option>
+                                        <option value="high_school">High School</option>
                                         <option value="undergraduate">Undergraduate</option>
                                         <option value="graduate">Graduate</option>
-                                        <option value="high_school">High School</option>
                                         <option value="professional">Professional Development</option>
                                     </select>
                                 </div>

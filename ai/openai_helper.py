@@ -28,7 +28,7 @@ def generate_course_structure(name, topic=None, level="undergraduate", duration=
     Args:
         name: Course name
         topic: Course topic or description (optional)
-        level: Educational level
+        level: Educational level (elementary, middle, high_school, undergraduate, graduate, professional)
         duration: Course duration
         
     Returns:
@@ -58,7 +58,7 @@ def generate_course_structure(name, topic=None, level="undergraduate", duration=
         response = client.chat.completions.create(
             model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
             messages=[
-                {"role": "system", "content": "You are an expert curriculum designer for higher education."},
+                {"role": "system", "content": "You are an expert curriculum designer for all educational levels from elementary school through higher education."},
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"}
