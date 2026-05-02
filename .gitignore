@@ -1,0 +1,35 @@
+# Environment & Secrets
+.env
+openai.key
+
+# Replit internal files
+.cache/
+.local/
+.upm/
+.pythonlibs/
+.agents/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Dependencies
+vendor/
+node_modules/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploaded assets (large binary files)
+generated-icon.png
+attached_assets/
