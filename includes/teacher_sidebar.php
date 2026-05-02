@@ -100,7 +100,29 @@
         </div>
     </div>
     
-    <div class="mt-auto pt-5 text-center small">
-        <p style="color:#F9A602; font-family: 'Playfair Display', serif; font-style: italic; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">iTeachXR v1.0<br>Excellence in Education</p>
+    <div class="mt-auto pt-4 px-3">
+        <?php if (!empty($current_user)): ?>
+        <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded" style="background:rgba(255,255,255,0.1);">
+            <?php if (!empty($current_user['image'])): ?>
+            <img src="<?= htmlspecialchars($current_user['image']) ?>" alt="Avatar" width="32" height="32" class="rounded-circle">
+            <?php else: ?>
+            <div style="width:32px;height:32px;border-radius:50%;background:#F9A602;display:flex;align-items:center;justify-content:center;font-weight:700;color:#1a3a6b;font-size:0.85rem;">
+                <?= htmlspecialchars(strtoupper(substr($current_user['name'] ?: $current_user['email'], 0, 1))) ?>
+            </div>
+            <?php endif; ?>
+            <div style="min-width:0;">
+                <div style="color:#fff;font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    <?= htmlspecialchars($current_user['name'] ?: 'Teacher') ?>
+                </div>
+                <div style="color:#F9A602;font-size:0.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    <?= htmlspecialchars($current_user['email']) ?>
+                </div>
+            </div>
+        </div>
+        <a href="/auth/logout.php" class="btn btn-sm w-100 fw-semibold mb-3" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.3);">
+            <i class="fas fa-sign-out-alt me-1"></i> Sign Out
+        </a>
+        <?php endif; ?>
+        <p class="text-center mb-0" style="color:#F9A602;font-family:'Playfair Display',serif;font-style:italic;font-size:0.8rem;text-shadow:0 1px 2px rgba(0,0,0,0.3);">iTeachXR v1.0<br>Excellence in Education</p>
     </div>
 </div>
