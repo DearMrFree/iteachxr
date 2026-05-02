@@ -1,5 +1,6 @@
 <?php
-// Teacher Dashboard Demo
+require_once(__DIR__ . '/../auth/session.php');
+$current_user = auth_require();
 $pageTitle = "Teacher Dashboard - iTeachXR";
 ?>
 <!DOCTYPE html>
