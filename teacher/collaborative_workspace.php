@@ -1,6 +1,7 @@
 <?php
 // Teacher Collaborative Workspace
-// Include accessibility helper functions
+require_once('../auth/session.php');
+$current_user = auth_require();
 require_once('../includes/accessibility.php');
 
 $pageTitle = "Collaborative Workspace - iTeachXR";
