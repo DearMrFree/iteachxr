@@ -1,5 +1,7 @@
 <?php
 // Teacher Workspace Detail page
+require_once(__DIR__ . '/../auth/session.php');
+$current_user = auth_require();
 $pageTitle = "Workspace Detail - iTeachXR";
 $user = [
     'id' => 1,
