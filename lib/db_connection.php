@@ -1,25 +1,35 @@
 <?php
-// iTeachXR - Database Connection Function
-
 /**
- * Get a connection to the database
- * @return PDO Database connection object
+ * iTeachXR — Database Connection
+ * Prefers DATABASE_URL (Replit/Neon), falls back to individual PG* vars.
  */
-function get_db_connection() {
-    $dbHost = getenv('PGHOST');
-    $dbPort = getenv('PGPORT');
-    $dbName = getenv('PGDATABASE');
-    $dbUser = getenv('PGUSER');
-    $dbPass = getenv('PGPASSWORD');
-    
-    $dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=$dbName;user=$dbUser;password=$dbPass";
-    
+function get_db_connection(): ?PDO {
+    $url = getenv('DATABASE_URL');
+
+    if ($url) {
+        $p    = parse_url($url);
+        $host = $p['host'] ?? '';
+        $port = $p['port'] ?? 5432;
+        $user = $p['user'] ?? '';
+        $pass = $p['pass'] ?? '';
+        $db   = ltrim($p['path'] ?? '', '/');
+        // Preserve any query params (e.g. sslmode=require)
+        $extra = isset($p['query']) ? ';' . str_replace('&', ';', $p['query']) : ';sslmode=require';
+        $dsn = "pgsql:host=$host;port=$port;dbname=$db;user=$user;password=$pass$extra";
+    } else {
+        $host = getenv('PGHOST');
+        $port = getenv('PGPORT') ?: 5432;
+        $db   = getenv('PGDATABASE');
+        $user = getenv('PGUSER');
+        $pass = getenv('PGPASSWORD');
+        $dsn  = "pgsql:host=$host;port=$port;dbname=$db;user=$user;password=$pass;sslmode=require";
+    }
+
     try {
-        $db = new PDO($dsn);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return $db;
+        $pdo = new PDO($dsn, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        return $pdo;
     } catch (PDOException $e) {
-        error_log("Database connection error: " . $e->getMessage());
+        error_log('iTeachXR DB error: ' . $e->getMessage());
         return null;
     }
 }
