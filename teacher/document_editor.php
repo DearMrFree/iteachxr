@@ -1,5 +1,7 @@
 <?php
 // Teacher Document Editor page
+require_once(__DIR__ . '/../auth/session.php');
+$current_user = auth_require();
 $pageTitle = "Document Editor - iTeachXR";
 $user = [
     'id' => 1,
