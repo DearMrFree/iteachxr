@@ -15,6 +15,7 @@
  */
 
 require_once __DIR__ . '/../../../auth/session.php';
+require_once __DIR__ . '/../../../lib/db_connection.php';
 
 function b64url_decode(string $s): string {
     $s = str_replace(['-', '_'], ['+', '/'], $s);
@@ -76,6 +77,12 @@ $payload = verify_bridge_token($token, $expected_aud);
 if (!$payload) {
     header('Location: /auth/login.php?error=invalid_token');
     exit;
+}
+
+// Upsert user + auto-provision student profile in Fly.io DB
+$db = get_db_connection();
+if ($db) {
+    db_upsert_user($db, $payload['sub'], $payload['name'] ?? '', $payload['image'] ?? '');
 }
 
 auth_set([
