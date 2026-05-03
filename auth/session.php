@@ -35,9 +35,10 @@ function auth_require(): array {
 function auth_set(array $user): void {
     session_regenerate_id(true);
     $_SESSION['user'] = [
-        'email'        => $user['email'],
-        'name'         => $user['name'] ?? '',
-        'image'        => $user['image'] ?? null,
+        'email'            => $user['email'],
+        'name'             => $user['name'] ?? '',
+        'image'            => $user['image'] ?? null,
+        'role'             => $user['role'] ?? 'student',
         'authenticated_at' => time(),
     ];
 }
