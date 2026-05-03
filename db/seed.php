@@ -5,10 +5,10 @@
  * Idempotent: safe to run multiple times (uses ON CONFLICT DO UPDATE).
  *
  * Seeds:
- *   • Ian Jiang   — student   (ian09jiang@gmail.com)
- *   • Freedom     — admin     (freedom@thevrschool.org)
- *   • Ian's full 32-course transcript (Grade 9 + Grade 10)
- *   • Ian's student profile  (GPA 4.00, 240 credits, ID 28467382VR)
+ *   • Demo Student — student   (demo.student@thevrschool.org)
+ *   • Freedom      — admin     (freedom@thevrschool.org)
+ *   • Demo student's full 32-course transcript (Grade 9 + Grade 10)
+ *   • Demo student profile  (GPA 4.00, 240 credits, ID VRS-DEMO-0001)
  *
  * Usage:
  *   php db/seed.php
@@ -46,12 +46,12 @@ echo "── Users ──\n";
 
 run($db, "
     INSERT INTO users (email, firstname, lastname, role)
-    VALUES ('ian09jiang@gmail.com', 'Ian', 'Jiang', 'student')
+    VALUES ('demo.student@thevrschool.org', 'Demo', 'Student', 'student')
     ON CONFLICT (email) DO UPDATE
-        SET firstname = 'Ian',
-            lastname  = 'Jiang',
+        SET firstname = 'Demo',
+            lastname  = 'Student',
             role      = 'student'
-", "Ian Jiang (student)");
+", "Demo Student (student)");
 
 run($db, "
     INSERT INTO users (email, firstname, lastname, role)
@@ -62,11 +62,11 @@ run($db, "
             role      = 'admin'
 ", "Freedom (admin)");
 
-$ianId = $db->query("SELECT id FROM users WHERE email = 'ian09jiang@gmail.com'")->fetchColumn();
-echo "  Ian Jiang user_id = $ianId\n\n";
+$ianId = $db->query("SELECT id FROM users WHERE email = 'demo.student@thevrschool.org'")->fetchColumn();
+echo "  Demo Student user_id = $ianId\n\n";
 
 // ─────────────────────────────────────────────────────────────
-// 2. STUDENT PROFILE — Ian Jiang
+// 2. STUDENT PROFILE — Demo Student
 // ─────────────────────────────────────────────────────────────
 echo "── Student profile ──\n";
 
@@ -75,19 +75,19 @@ run($db, "
         (user_id, student_id, address, current_grade, enrollment_status,
          graduation_date, gpa, total_credits)
     VALUES
-        (?, '28467382VR',
-         '531 Lasuen Mall, Stanford, CA 94305',
+        (?, 'VRS-DEMO-0001',
+         '123 University Ave, Palo Alto, CA 94301',
          10, 'Good Standing',
          '2029-06-15', 4.00, 240)
     ON CONFLICT (user_id) DO UPDATE
-        SET student_id        = '28467382VR',
-            address           = '531 Lasuen Mall, Stanford, CA 94305',
+        SET student_id        = 'VRS-DEMO-0001',
+            address           = '123 University Ave, Palo Alto, CA 94301',
             current_grade     = 10,
             enrollment_status = 'Good Standing',
             graduation_date   = '2029-06-15',
             gpa               = 4.00,
             total_credits     = 240
-", "Ian Jiang student profile", [$ianId]);
+", "Demo Student profile", [$ianId]);
 
 echo "\n";
 
@@ -188,7 +188,7 @@ $tc = $db->query("SELECT SUM(credits) FROM transcript_entries WHERE user_id = $i
 $nc = $db->query("SELECT COUNT(*)     FROM transcript_entries WHERE user_id = $ianId")->fetchColumn();
 $sp = $db->query("SELECT gpa, total_credits, student_id, current_grade FROM student_profiles WHERE user_id = $ianId")->fetch();
 
-printf("  Ian Jiang (#%d):\n",  $ianId);
+printf("  Demo Student (#%d):\n",  $ianId);
 printf("    Transcript rows : %d\n", $nc);
 printf("    Credits (sum)   : %s\n", $tc);
 printf("    GPA (profile)   : %s\n", $sp['gpa']);

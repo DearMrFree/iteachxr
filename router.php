@@ -13,7 +13,6 @@ $clean = rtrim($path, '/') ?: '/';
 $routes = [
     // Auth
     '/api/auth/sso/finish' => __DIR__ . '/api/auth/sso/finish.php',
-    '/api/ecosystem/summary' => __DIR__ . '/api/ecosystem/summary.php',
     '/auth/logout'         => __DIR__ . '/auth/logout.php',
     '/auth/login'          => __DIR__ . '/auth/login.php',
 

@@ -33,7 +33,9 @@ api/auth/sso/
 
 lib/
   db_connection.php  — get_db_connection() (FLY_DATABASE_URL → DATABASE_URL → PG* vars)
-                       db_upsert_user() — upsert user + auto-provision student_profiles
+                       db_upsert_user()            — upsert user + auto-provision on first SSO login
+                       _db_refresh_student_totals() — recomputes GPA/credits from transcript on every login
+                       _db_compute_student_totals() — weighted GPA calculation (A+=4.3 … F=0.0)
 
 includes/
   teacher_sidebar.php — teacher nav with user avatar + signout
@@ -49,7 +51,9 @@ student/
   transcript_preview.php — auth-bypass preview for canvas/admin review
 
 db/
-  migrate_transcripts.php — schema migration (run once to set up tables)
+  migrate.php             — complete idempotent schema migration (run on fresh deploys)
+  seed.php                — idempotent seed: Ian's 32-course transcript + Freedom admin
+  migrate_transcripts.php — legacy first-run script (superseded by migrate.php + seed.php)
 ```
 
 ## Database Schema (Fly.io Postgres — sofaitranscript.fly.dev)

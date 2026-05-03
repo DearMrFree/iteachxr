@@ -5,16 +5,10 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) {
-    $forwardedProto = strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '');
-    $isSecure =
-        (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off') ||
-        $forwardedProto === 'https' ||
-        (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_SSL']) === 'on');
-
     session_set_cookie_params([
         'lifetime' => 30 * 24 * 60 * 60,
         'path'     => '/',
-        'secure'   => $isSecure,
+        'secure'   => isset($_SERVER['HTTPS']),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);

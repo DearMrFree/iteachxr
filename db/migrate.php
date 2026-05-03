@@ -108,14 +108,16 @@ CREATE INDEX IF NOT EXISTS te_user_grade_idx ON transcript_entries (user_id, gra
 
 // ─────────────────────────────────────────────────────────────
 // 4. ADDITIVE CHANGES — safe to run on an existing DB
-//    The unique index powers ON CONFLICT in seed.php even on databases
-//    whose transcript_entries table predates the inline UNIQUE constraint.
+//    These use ALTER TABLE … ADD … IF NOT EXISTS so they are
+//    no-ops when the constraint / index already exists.
 // ─────────────────────────────────────────────────────────────
 
+// Unique constraint that powers ON CONFLICT in seed.php
 run($db, "
-CREATE UNIQUE INDEX IF NOT EXISTS te_unique_course_idx
-    ON transcript_entries (user_id, grade_level, ucag_id, course_title);
-", "transcript_entries: te_unique_course unique index");
+ALTER TABLE transcript_entries
+    ADD CONSTRAINT IF NOT EXISTS te_unique_course
+    UNIQUE (user_id, grade_level, ucag_id, course_title);
+", "transcript_entries: te_unique_course unique constraint");
 
 // ─────────────────────────────────────────────────────────────
 // Done
