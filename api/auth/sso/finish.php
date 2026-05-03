@@ -70,8 +70,10 @@ if (!$token) {
     exit;
 }
 
-$expected_aud = $_SERVER['HTTP_HOST'] ?? 'iteachxr.com';
-$expected_aud = preg_replace('/:\d+$/', '', $expected_aud);
+// The token audience is always "iteachxr.com" — the canonical domain
+// registered in the SSO allowlist — regardless of which hostname
+// (Railway, custom domain, etc.) this deployment runs on.
+$expected_aud = 'iteachxr.com';
 
 $payload = verify_bridge_token($token, $expected_aud);
 if (!$payload) {
