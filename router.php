@@ -16,11 +16,18 @@ $routes = [
     '/auth/logout'         => __DIR__ . '/auth/logout.php',
     '/auth/login'          => __DIR__ . '/auth/login.php',
 
+    // Admin portal
+    '/admin'                      => __DIR__ . '/admin/dashboard.php',
+    '/admin/dashboard'            => __DIR__ . '/admin/dashboard.php',
+    '/admin/student_transcript'   => __DIR__ . '/admin/student_transcript.php',
+
     // Student portal
-    '/student'             => __DIR__ . '/student/dashboard.php',
-    '/student/dashboard'   => __DIR__ . '/student/dashboard.php',
-    '/student/courses'     => __DIR__ . '/student/courses.php',
-    '/student/transcript'  => __DIR__ . '/student/transcript.php',
+    '/student'                    => __DIR__ . '/student/dashboard.php',
+    '/student/dashboard'          => __DIR__ . '/student/dashboard.php',
+    '/student/dashboard_preview'  => __DIR__ . '/student/dashboard_preview.php',
+    '/student/courses'            => __DIR__ . '/student/courses.php',
+    '/student/transcript'         => __DIR__ . '/student/transcript.php',
+    '/student/transcript_preview' => __DIR__ . '/student/transcript_preview.php',
 
     // Teacher portal
     '/teacher'             => __DIR__ . '/teacher/dashboard.php',
