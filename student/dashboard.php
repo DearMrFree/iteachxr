@@ -25,8 +25,8 @@ if (!trim($displayName)) $displayName = explode('@', $current_user['email'])[0];
 $firstName = explode(' ', trim($displayName))[0];
 $initials  = strtoupper(implode('', array_map(fn($w) => $w[0] ?? '', array_slice(explode(' ', trim($displayName)), 0, 2))));
 
-// ── Ian Jiang special profile (authoritative source) ─────────
-$IAN_EMAIL    = 'ian09jiang@gmail.com';
+// ── Demo Student special profile (DB not yet seeded) ─────────
+$IAN_EMAIL    = 'demo.student@thevrschool.org';
 $isIan        = strtolower(trim($current_user['email'])) === $IAN_EMAIL;
 
 $profile      = [];
@@ -39,17 +39,17 @@ $totalCourses = 0;
 $studentId    = '';
 
 if ($isIan) {
-    $displayName  = 'Ian Jiang';
-    $firstName    = 'Ian';
-    $initials     = 'IJ';
+    $displayName  = 'Demo Student';
+    $firstName    = 'Demo';
+    $initials     = 'DS';
     $gpa          = '4.00';
     $gradeLevel   = 10;
     $totalCredits = 240;
     $enrollStatus = 'Good Standing';
     $gradeName    = 'Sophomore';
     $totalCourses = 32;
-    $studentId    = '28467382VR';
-    $profile      = ['student_id' => '28467382VR'];
+    $studentId    = 'VRS-DEMO-0001';
+    $profile      = ['student_id' => 'VRS-DEMO-0001'];
 } elseif ($uid && $db) {
     $p = $db->prepare("SELECT * FROM student_profiles WHERE user_id = ?");
     $p->execute([$uid]);
@@ -72,7 +72,7 @@ $recent = [];
 if ($isIan && $db) {
     $r = $db->query("
         SELECT grade_level, ucag_id, subject_area, course_title, course_level, grade, credits, school_year
-        FROM transcript_entries WHERE user_id = (SELECT id FROM users WHERE email='ian09jiang@gmail.com' LIMIT 1)
+        FROM transcript_entries WHERE user_id = (SELECT id FROM users WHERE email='demo.student@thevrschool.org' LIMIT 1)
         ORDER BY grade_level DESC, seq DESC LIMIT 8
     ");
     if ($r) $recent = $r->fetchAll(PDO::FETCH_ASSOC);

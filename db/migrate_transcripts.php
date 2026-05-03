@@ -1,6 +1,6 @@
 <?php
 /**
- * iTeachXR - Transcript Schema Migration + Ian Jiang seed data
+ * iTeachXR - Transcript Schema Migration + Demo Student seed data
  * Run: php db/migrate_transcripts.php
  */
 if (php_sapi_name() !== 'cli') die('CLI only');
@@ -52,27 +52,27 @@ CREATE TABLE IF NOT EXISTS transcript_entries (
 );
 ", "transcript_entries table");
 
-// ── Ian Jiang user ────────────────────────────────────────────
+// ── Demo Student user ─────────────────────────────────────────
 // Auth is Google SSO — a password is never used for login.
 // Generate a random, unusable token so the column is never empty.
 $unusableHash = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
 run($db, "
 INSERT INTO users (username, password, email, firstname, lastname, role, is_active)
-VALUES ('ian.jiang', '$unusableHash', 'ian09jiang@gmail.com', 'Ian', 'Jiang', 'student', TRUE)
-ON CONFLICT (email) DO UPDATE SET firstname='Ian', lastname='Jiang', role='student', is_active=TRUE;
-", "Ian Jiang user");
+VALUES ('demo.student', '$unusableHash', 'demo.student@thevrschool.org', 'Demo', 'Student', 'student', TRUE)
+ON CONFLICT (email) DO UPDATE SET firstname='Demo', lastname='Student', role='student', is_active=TRUE;
+", "Demo Student user");
 
-$uid = $db->query("SELECT id FROM users WHERE email='ian09jiang@gmail.com'")->fetchColumn();
-echo "  Ian Jiang user_id = $uid\n";
+$uid = $db->query("SELECT id FROM users WHERE email='demo.student@thevrschool.org'")->fetchColumn();
+echo "  Demo Student user_id = $uid\n";
 
 // ── student profile ───────────────────────────────────────────
 run($db, "
 INSERT INTO student_profiles (user_id, student_id, dob, address, graduation_date, current_grade, enrollment_status)
-VALUES ($uid, '28467382VR', '2010-11-15',
-        '531 Lasuen Mall, Stanford, CA 94305',
+VALUES ($uid, 'VRS-DEMO-0001', '2010-01-01',
+        '123 University Ave, Palo Alto, CA 94301',
         '2029-06-15', 10, 'Good Standing')
 ON CONFLICT (user_id) DO UPDATE SET
-  student_id='28467382VR', current_grade=10, enrollment_status='Good Standing';
+  student_id='VRS-DEMO-0001', current_grade=10, enrollment_status='Good Standing';
 ", "Ian profile");
 
 // ── Grade 9 transcript entries ────────────────────────────────
@@ -144,9 +144,9 @@ foreach ($courses as $c) {
                    ON CONFLICT (user_id, course_id) DO NOTHING");
     } catch (PDOException $e) {}
 }
-echo "  OK: Ian enrolled in " . count($courses) . " LMS courses\n";
+echo "  OK: Demo Student enrolled in " . count($courses) . " LMS courses\n";
 
 echo "\n=== Migration complete ===\n";
-echo "  Student: Ian Jiang <ian09jiang@gmail.com>\n";
-echo "  Student ID: 28467382VR | GPA: 4.00 | Grade: Sophomore\n";
+echo "  Student: Demo Student <demo.student@thevrschool.org>\n";
+echo "  Student ID: VRS-DEMO-0001 | GPA: 4.00 | Grade: Sophomore\n";
 echo "  Total transcript entries: " . (count($g9) + count($g10)) . "\n";

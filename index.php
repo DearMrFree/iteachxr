@@ -182,7 +182,7 @@ body{font-family:'Poppins',sans-serif;color:var(--txt);background:#fff;overflow-
             <div class="hc-dot" style="background:#ff5f57"></div>
             <div class="hc-dot" style="background:#febc2e"></div>
             <div class="hc-dot" style="background:#28c840"></div>
-            <span class="hc-label">Ian Jiang · Student Dashboard · iTeachXR</span>
+            <span class="hc-label">Demo Student · Dashboard · iTeachXR</span>
           </div>
           <div class="chip-grid">
             <div class="chip"><div class="chip-val gold">4.00</div><div class="chip-lbl">Cumulative GPA</div></div>
@@ -235,7 +235,7 @@ body{font-family:'Poppins',sans-serif;color:var(--txt);background:#fff;overflow-
     <div class="row g-4">
       <div class="col-6 col-md-3 sbar-item"><div class="sbar-num">402+</div><div class="sbar-lbl">Pioneers Enrolled</div></div>
       <div class="col-6 col-md-3 sbar-item"><div class="sbar-num">32</div><div class="sbar-lbl">UC A-G Courses</div></div>
-      <div class="col-6 col-md-3 sbar-item"><div class="sbar-num">4.00</div><div class="sbar-lbl">Ian Jiang GPA</div></div>
+      <div class="col-6 col-md-3 sbar-item"><div class="sbar-num">4.00</div><div class="sbar-lbl">Student GPA</div></div>
       <div class="col-6 col-md-3 sbar-item"><div class="sbar-num">Live</div><div class="sbar-lbl">Fly.io Database</div></div>
     </div>
   </div>
@@ -315,7 +315,7 @@ body{font-family:'Poppins',sans-serif;color:var(--txt);background:#fff;overflow-
           </div>
           <div class="pf">
             <span>Enter Student Portal</span>
-            <span class="pill" style="background:#ede9fe;color:#6d28d9">Ian Jiang</span>
+            <span class="pill" style="background:#ede9fe;color:#6d28d9">Demo Student</span>
           </div>
         </a>
       </div>

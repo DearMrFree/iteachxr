@@ -1,6 +1,6 @@
 <?php
 /**
- * Transcript Preview — auth-bypass render of Ian Jiang's official transcript.
+ * Transcript Preview — auth-bypass render of Demo Student's official transcript.
  * DEV ONLY: blocked in production deployments.
  */
 
@@ -17,10 +17,10 @@ if (!$_isDev) {
     exit;
 }
 
-$studentName    = 'Jiang Ian Wenkai';
-$studentEmail   = 'ian09jiang@gmail.com';
-$studentId      = '28467382VR';
-$address        = '531 Lasuen Mall, Stanford, CA 94305';
+$studentName    = 'Demo Student';
+$studentEmail   = 'demo.student@thevrschool.org';
+$studentId      = 'VRS-DEMO-0001';
+$address        = '123 University Ave, Palo Alto, CA 94301';
 $gradDate       = 'June 2029';
 $cumGPA         = '4.00';
 $totalCredits   = 240;
@@ -76,7 +76,7 @@ $entries = [
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Official Transcript — Jiang Ian Wenkai — The VR School</title>
+<title>Official Transcript — Demo Student — The VR School</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -413,7 +413,7 @@ body { font-family:'Source Serif 4',serif; background:var(--bg); margin:0; paddi
 
     <!-- Print Strip -->
     <div class="print-strip">
-        <span>Ian Jiang &nbsp;·&nbsp; <?= $studentId ?> &nbsp;·&nbsp; The VR School Official Transcript</span>
+        <span>Demo Student &nbsp;·&nbsp; <?= $studentId ?> &nbsp;·&nbsp; The VR School Official Transcript</span>
         <button onclick="window.print()">⬇ Print / Save PDF</button>
     </div>
 

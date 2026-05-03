@@ -207,8 +207,8 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);margin:0;color:#2d374
     <a href="#roster" onclick="document.getElementById('roster').scrollIntoView({behavior:'smooth'});return false">
       <i class="fas fa-users"></i> Student Roster
     </a>
-    <a href="/admin/student_transcript.php?email=ian09jiang%40gmail.com">
-      <i class="fas fa-user-graduate"></i> Ian Jiang
+    <a href="/admin/student_transcript.php">
+      <i class="fas fa-user-graduate"></i> Demo Student
     </a>
   </div>
 
@@ -258,8 +258,8 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);margin:0;color:#2d374
         <p>You have full administrative access to all student records, transcripts, and system settings across The VR School.</p>
       </div>
       <div class="wb-actions">
-        <a href="/admin/student_transcript.php?email=ian09jiang%40gmail.com" class="wb-btn wb-btn-gold">
-          <i class="fas fa-scroll"></i> Ian Jiang's Transcript
+        <a href="/admin/student_transcript.php" class="wb-btn wb-btn-gold">
+          <i class="fas fa-scroll"></i> Demo Student's Transcript
         </a>
         <a href="https://ai.thevrschool.org" target="_blank" class="wb-btn wb-btn-ghost">
           <i class="fas fa-external-link-alt"></i> AI School Hub
@@ -303,8 +303,8 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);margin:0;color:#2d374
     <div class="ian-card">
       <div class="ian-header">
         <div class="ian-badge">⭐ Featured Student</div>
-        <h4>Ian Jiang</h4>
-        <p>ian09jiang@gmail.com &nbsp;·&nbsp; Student ID: 28467382VR &nbsp;·&nbsp; Grade 10 Sophomore</p>
+        <h4>Demo Student</h4>
+        <p>demo.student@thevrschool.org &nbsp;·&nbsp; Student ID: VRS-DEMO-0001 &nbsp;·&nbsp; Grade 10 Sophomore</p>
       </div>
       <div class="ian-body">
         <div class="ian-stats">
@@ -326,10 +326,10 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);margin:0;color:#2d374
           </div>
         </div>
         <div class="ian-actions">
-          <a href="/admin/student_transcript.php?email=ian09jiang%40gmail.com" class="ian-btn ian-btn-primary">
+          <a href="/admin/student_transcript.php" class="ian-btn ian-btn-primary">
             <i class="fas fa-scroll"></i> View Full Transcript
           </a>
-          <a href="/admin/student_transcript.php?email=ian09jiang%40gmail.com&print=1" target="_blank" class="ian-btn ian-btn-outline">
+          <a href="/admin/student_transcript.php&print=1" target="_blank" class="ian-btn ian-btn-outline">
             <i class="fas fa-print"></i> Print Transcript
           </a>
           <a href="https://www.thevrschool.org/students/jiang" target="_blank" class="ian-btn ian-btn-outline">
@@ -444,9 +444,9 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);margin:0;color:#2d374
 
         <!-- Quick Actions -->
         <div style="display:flex;flex-direction:column;gap:.65rem">
-          <a href="/admin/student_transcript.php?email=ian09jiang%40gmail.com" class="qa-card">
+          <a href="/admin/student_transcript.php" class="qa-card">
             <div class="qa-icon" style="background:#ede9fe"><i class="fas fa-scroll" style="color:#7c3aed"></i></div>
-            <div><div class="qa-title">Ian Jiang — Transcript</div><div class="qa-sub">View · Print · Download PDF</div></div>
+            <div><div class="qa-title">Demo Student — Transcript</div><div class="qa-sub">View · Print · Download PDF</div></div>
           </a>
           <a href="https://www.thevrschool.org/teacher/iteachxr" target="_blank" class="qa-card">
             <div class="qa-icon" style="background:#dbeafe"><i class="fas fa-chalkboard" style="color:#2563eb"></i></div>

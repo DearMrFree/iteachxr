@@ -1,6 +1,6 @@
 <?php
 /**
- * Student Dashboard Preview — auth-bypass view of Ian Jiang's dashboard.
+ * Student Dashboard Preview — auth-bypass view of Demo Student's dashboard.
  * DEV ONLY: blocked in production deployments.
  */
 
@@ -21,9 +21,9 @@ require_once __DIR__ . '/../lib/db_connection.php';
 
 $db = get_db_connection();
 
-$email        = 'ian09jiang@gmail.com';
-$displayName  = 'Ian Jiang';
-$firstName    = 'Ian';
+$email        = 'demo.student@thevrschool.org';
+$displayName  = 'Demo Student';
+$firstName    = 'Demo';
 $gpa          = '—';
 $gradeLevel   = 10;
 $totalCredits = 0;
@@ -66,7 +66,7 @@ if (!$uid) {
     $gpa          = '4.00';
     $totalCredits = 240;
     $totalCourses = 32;
-    $profile      = ['student_id'=>'28467382VR'];
+    $profile      = ['student_id'=>'VRS-DEMO-0001'];
     $recent = [
         ['subject_area'=>'Mathematics',      'course_title'=>'Advanced Calculus BC',              'grade'=>'A+','credits'=>5,'school_year'=>'2025-2026'],
         ['subject_area'=>'Computer Science',  'course_title'=>'ACC Design as Discovery (Stanford)', 'grade'=>'A+','credits'=>5,'school_year'=>'2025-2026'],
@@ -84,7 +84,7 @@ if (!$uid) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ian Jiang — Student Dashboard — iTeachXR</title>
+<title>Demo Student — Student Dashboard — iTeachXR</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -138,7 +138,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:#2d3748;margin:
         <div class="d-flex align-items-center gap-2">
             <div class="av">I</div>
             <div style="min-width:0">
-                <div style="font-size:.78rem;color:#fff;font-weight:600">Ian Jiang</div>
+                <div style="font-size:.78rem;color:#fff;font-weight:600">Demo Student</div>
                 <div style="font-size:.62rem;color:rgba(255,255,255,.4)">Student · Grade 10</div>
             </div>
         </div>
@@ -170,7 +170,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:#2d3748;margin:
                     </div>
                 </div>
                 <div>
-                    <h4 class="fw-bold mb-1">Welcome back, Ian!</h4>
+                    <h4 class="fw-bold mb-1">Welcome back, Demo!</h4>
                     <p class="mb-2" style="opacity:.82;font-size:.87rem"><?= htmlspecialchars($gradeName) ?> · <?= htmlspecialchars($enrollStatus) ?> · The VR School Stanford</p>
                     <div class="d-flex gap-2 flex-wrap">
                         <span class="badge" style="background:rgba(249,166,2,.25);color:var(--gold)">

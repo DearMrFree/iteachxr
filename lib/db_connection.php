@@ -61,7 +61,7 @@ function get_db_connection(): ?PDO {
  * Upsert a user on every Google SSO sign-in, then auto-provision a
  * student_profile row the first time a student logs in.
  *
- * For students who already have transcript data (e.g. Ian Jiang, whose
+ * For students who already have transcript data (e.g. demo student, whose
  * transcript was seeded before first login), GPA and credit totals are
  * computed live from transcript_entries so the profile is always accurate.
  *

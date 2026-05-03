@@ -36,14 +36,14 @@ if ($db) {
     }
 }
 
-// ── Ian Jiang hardcoded fallback (authoritative source of truth) ──
-$IAN_EMAIL = 'ian09jiang@gmail.com';
+// ── Demo Student hardcoded fallback (DB not yet seeded) ──
+$IAN_EMAIL = 'demo.student@thevrschool.org';
 $isIan = strtolower(trim($current_user['email'])) === $IAN_EMAIL;
 
 if (empty($entries) && $isIan) {
     $profile = $profile ?: [
-        'student_id'        => '28467382VR',
-        'address'           => '531 Lasuen Mall, Stanford, CA 94305',
+        'student_id'        => 'VRS-DEMO-0001',
+        'address'           => '123 University Ave, Palo Alto, CA 94301',
         'graduation_date'   => '2029-06-15',
         'current_grade'     => 10,
         'enrollment_status' => 'Good Standing',
@@ -93,7 +93,7 @@ if (empty($entries) && $isIan) {
 
 // ── Computed values ───────────────────────────────────────────
 $nameParts      = explode(' ', trim($current_user['name'] ?: (($urow['firstname']??'').' '.($urow['lastname']??''))));
-$studentName    = $isIan ? 'Jiang Ian Wenkai' : implode(' ', $nameParts);
+$studentName    = $isIan ? 'Demo Student' : implode(' ', $nameParts);
 $studentEmail   = $current_user['email'];
 $studentId      = $profile['student_id']      ?? 'N/A';
 $address        = $profile['address']         ?? '';
