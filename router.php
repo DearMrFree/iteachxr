@@ -19,6 +19,7 @@ $routes = [
     // Admin portal
     '/admin'                      => __DIR__ . '/admin/dashboard.php',
     '/admin/dashboard'            => __DIR__ . '/admin/dashboard.php',
+    '/admin/dashboard_preview'    => __DIR__ . '/admin/dashboard_preview.php',
     '/admin/student_transcript'   => __DIR__ . '/admin/student_transcript.php',
 
     // Student portal
