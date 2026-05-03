@@ -53,10 +53,12 @@ CREATE TABLE IF NOT EXISTS transcript_entries (
 ", "transcript_entries table");
 
 // ── Ian Jiang user ────────────────────────────────────────────
-$hash = password_hash('student123', PASSWORD_DEFAULT);
+// Auth is Google SSO — a password is never used for login.
+// Generate a random, unusable token so the column is never empty.
+$unusableHash = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
 run($db, "
 INSERT INTO users (username, password, email, firstname, lastname, role, is_active)
-VALUES ('ian.jiang', '$hash', 'ian09jiang@gmail.com', 'Ian', 'Jiang', 'student', TRUE)
+VALUES ('ian.jiang', '$unusableHash', 'ian09jiang@gmail.com', 'Ian', 'Jiang', 'student', TRUE)
 ON CONFLICT (email) DO UPDATE SET firstname='Ian', lastname='Jiang', role='student', is_active=TRUE;
 ", "Ian Jiang user");
 
