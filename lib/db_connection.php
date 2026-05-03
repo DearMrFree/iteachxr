@@ -151,8 +151,9 @@ function _db_refresh_student_totals(PDO $db, int $uid): void {
  * Returns [float|null $gpa, int $totalCredits] computed from transcript_entries.
  */
 function _db_compute_student_totals(PDO $db, int $uid): array {
+    // Standard 4.0 unweighted scale — A and A+ both cap at 4.0
     $scale = [
-        'A+' => 4.3, 'A' => 4.0, 'A-' => 3.7,
+        'A+' => 4.0, 'A' => 4.0, 'A-' => 3.7,
         'B+' => 3.3, 'B' => 3.0, 'B-' => 2.7,
         'C+' => 2.3, 'C' => 2.0, 'C-' => 1.7,
         'D+' => 1.3, 'D' => 1.0, 'D-' => 0.7,
