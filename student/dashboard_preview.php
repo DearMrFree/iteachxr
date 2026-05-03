@@ -1,8 +1,22 @@
 <?php
 /**
  * Student Dashboard Preview — auth-bypass view of Ian Jiang's dashboard.
- * For canvas/admin review only. No real auth required.
+ * DEV ONLY: blocked in production deployments.
  */
+
+// Block in production — only reachable on .replit.dev / localhost dev domains
+$_host = $_SERVER['HTTP_HOST'] ?? '';
+$_isDev = str_contains($_host, '.replit.dev')
+       || str_contains($_host, 'localhost')
+       || str_contains($_host, '127.0.0.1')
+       || $_host === '';
+if (!$_isDev) {
+    http_response_code(403);
+    header('Content-Type: text/plain');
+    echo '403 Forbidden — preview pages are disabled in production.';
+    exit;
+}
+
 require_once __DIR__ . '/../lib/db_connection.php';
 
 $db = get_db_connection();
