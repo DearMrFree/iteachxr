@@ -81,16 +81,28 @@ if (!$payload) {
 
 // Upsert user + auto-provision student profile in Fly.io DB
 $db = get_db_connection();
+$dbUser = [];
 if ($db) {
-    db_upsert_user($db, $payload['sub'], $payload['name'] ?? '', $payload['image'] ?? '');
+    $dbUser = db_upsert_user($db, $payload['sub'], $payload['name'] ?? '', $payload['image'] ?? '');
 }
+
+$role = $dbUser['role'] ?? 'student';
 
 auth_set([
     'email' => $payload['sub'],
     'name'  => $payload['name'] ?? '',
     'image' => $payload['image'] ?? null,
+    'role'  => $role,
 ]);
 
-$next = (str_starts_with($next, '/') && !str_starts_with($next, '//')) ? $next : '/';
+// Role-based default redirect when no $next is specified
+if ($next === '/') {
+    $next = match($role) {
+        'admin', 'teacher' => '/admin/dashboard.php',
+        default            => '/student/dashboard.php',
+    };
+}
+
+$next = (str_starts_with($next, '/') && !str_starts_with($next, '//')) ? $next : '/student/dashboard.php';
 header('Location: ' . $next);
 exit;
