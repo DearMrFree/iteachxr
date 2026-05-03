@@ -26,7 +26,10 @@ $next  = $_GET['next'] ?? '/';
 $error = $_GET['error'] ?? '';
 
 $canonical = rtrim(getenv('CANONICAL_AUTH_URL') ?: 'https://ai.thevrschool.org', '/');
-$domain    = getenv('APP_DOMAIN') ?: 'iteachxr.com';
+// Always use the canonical domain — the SSO allowlist knows "iteachxr.com",
+// not the Railway/custom deployment hostname. The handoff uses ITEACHXR_URL
+// to redirect back to the correct deployment after minting the token.
+$domain = 'iteachxr.com';
 
 // Build the handoff URL — if $next is '/' the SSO finish handler picks
 // the role-appropriate dashboard automatically.
