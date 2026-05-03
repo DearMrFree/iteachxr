@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_pgsql", "php83Extensions.pgsql", "php83Extensions.mbstring", "php83Extensions.curl", "php83Extensions.openssl"]
+nixPkgs = ["php82", "php82Extensions.pdo_pgsql", "php82Extensions.pgsql", "php82Extensions.mbstring", "php82Extensions.openssl"]
 
 [start]
-cmd = "php -S 0.0.0.0:${PORT:-5000} router.php"
+cmd = "php -S 0.0.0.0:$PORT router.php"
