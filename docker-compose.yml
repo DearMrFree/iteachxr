@@ -1,0 +1,223 @@
+version: '3.8'
+
+services:
+  # ========================================================================
+  # KAFKA - Event Streaming Platform (Required by LittleHorse)
+  # ========================================================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: iteachxr-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - iteachxr-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: iteachxr-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - iteachxr-network
+
+  # ========================================================================
+  # POSTGRESQL - Student Data & Workflow State
+  # ========================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: iteachxr-postgres
+    environment:
+      POSTGRES_USER: iteachxr_user
+      POSTGRES_PASSWORD: iteachxr_password_dev
+      POSTGRES_DB: iteachxr
+      POSTGRES_INITDB_ARGS: "-c log_statement=all"
+    ports:
+      - "5432:5432"
+    volumes:
+      - iteachxr-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iteachxr_user -d iteachxr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - iteachxr-network
+
+  # ========================================================================
+  # LITTLEHORSE SERVER - Workflow Orchestration Engine
+  # ========================================================================
+  littlehorse:
+    image: ghcr.io/littlehorse-enterprises/littlehorse/lh-standalone:latest
+    container_name: iteachxr-littlehorse
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      # Kafka Configuration
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      
+      # LittleHorse Configuration
+      LITTLEHORSE_SERVER_ADVERTISED_HOST: littlehorse
+      LITTLEHORSE_SERVER_ADVERTISED_PORT: 2023
+      
+      # Metrics & Logging
+      LITTLEHORSE_LOG_LEVEL: INFO
+    ports:
+      - "2023:2023"   # gRPC API
+      - "8080:8080"   # Dashboard
+      - "9090:9090"   # Prometheus metrics
+    volumes:
+      - iteachxr-littlehorse-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - iteachxr-network
+
+  # ========================================================================
+  # TASK WORKERS - Execute Business Logic
+  # ========================================================================
+  task-workers:
+    build:
+      context: .
+      dockerfile: Dockerfile.workers
+    container_name: iteachxr-task-workers
+    depends_on:
+      littlehorse:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      LHC_API_HOST: littlehorse
+      LHC_API_PORT: 2023
+      DATABASE_URL: postgresql://iteachxr_user:iteachxr_password_dev@postgres:5432/iteachxr
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      LOG_LEVEL: INFO
+      WORKER_THREADS: "4"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - iteachxr-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ========================================================================
+  # API BRIDGE - REST Interface
+  # ========================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: iteachxr-api
+    depends_on:
+      littlehorse:
+        condition: service_healthy
+      task-workers:
+        condition: service_healthy
+    environment:
+      LHC_API_HOST: littlehorse
+      LHC_API_PORT: 2023
+      DATABASE_URL: postgresql://iteachxr_user:iteachxr_password_dev@postgres:5432/iteachxr
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      API_LOG_LEVEL: info
+      API_WORKERS: "2"
+    ports:
+      - "8000:8000"  # REST API
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/workflows/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - iteachxr-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # ========================================================================
+  # PROMETHEUS - Metrics Collection
+  # ========================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: iteachxr-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - iteachxr-prometheus-data:/prometheus
+    ports:
+      - "9091:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - iteachxr-network
+
+  # ========================================================================
+  # GRAFANA - Metrics Dashboard
+  # ========================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: iteachxr-grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_INSTALL_PLUGINS: redis-datasource
+    volumes:
+      - iteachxr-grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    ports:
+      - "3000:3000"
+    networks:
+      - iteachxr-network
+
+networks:
+  iteachxr-network:
+    driver: bridge
+
+volumes:
+  iteachxr-postgres-data:
+  iteachxr-littlehorse-data:
+  iteachxr-prometheus-data:
+  iteachxr-grafana-data:
